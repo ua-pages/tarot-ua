@@ -1,8 +1,8 @@
 const baseHeaders = {
     'Content-Type': 'application/json'
 };
-export async function fetchCards() {
-    const response = await fetch('/api/tarot/cards', { headers: baseHeaders });
+export async function fetchCards(count = 78) {
+    const response = await fetch(`/api/tarot/cards?count=${count}`, { headers: baseHeaders });
     if (!response.ok) {
         throw new Error('Не вдалося завантажити карти');
     }

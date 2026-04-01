@@ -6,14 +6,13 @@ export class TarotController {
   constructor(private readonly tarotService: TarotService) {}
 
   @Get('cards')
-  getCards() {
-    return this.tarotService.getAllCards();
+  getCards(@Query('count') count?: number) {
+    return this.tarotService.getAllCards(count ?? 78);
   }
 
   @Get('draw')
-  draw(@Query('count') count?: string) {
-    const parsed = Number(count ?? 3);
-    return this.tarotService.drawSpread(Number.isNaN(parsed) ? 3 : parsed);
+  draw(@Query('count') count?: number) {
+    return this.tarotService.drawSpread(count ?? 3);
   }
 
   @Get('card-of-day')

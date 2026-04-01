@@ -5,6 +5,7 @@ export interface TarotCard {
   name: string;
   arcana: Arcana;
   keywords: string[];
+  suit?: string;
   meaningUpright: string;
   meaningReversed: string;
   image: string;
