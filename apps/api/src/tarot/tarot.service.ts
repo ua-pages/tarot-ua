@@ -10,12 +10,12 @@ export class TarotService implements OnModuleInit {
     await this.graphService.seedIfNeeded();
   }
 
-  async getAllCards(): Promise<TarotCard[]> {
-    return this.graphService.getCards();
+  async getAllCards(limit: number = 78): Promise<TarotCard[]> {
+    return this.graphService.getCards(limit);
   }
 
   async drawSpread(count = 3): Promise<DrawnCard[]> {
-    const cards = await this.getAllCards();
+    const cards = await this.getAllCards(count);
     const positions = ['Минуле', 'Теперішнє', 'Майбутнє', 'Виклик', 'Порада'];
     const safeCount = Math.max(1, Math.min(count, Math.min(cards.length, positions.length)));
 
@@ -37,7 +37,7 @@ export class TarotService implements OnModuleInit {
   }
 
   async getCardOfDay(date = new Date()): Promise<DrawnCard> {
-    const cards = await this.getAllCards();
+    const cards = await this.getAllCards(1);
     const dayKey = this.toDayKey(date);
     const hash = this.hash(dayKey);
 

@@ -17,15 +17,25 @@ export class TarotGraphService implements OnModuleDestroy {
     });
   }
 
-  async getCards(): Promise<TarotCard[]> {
+  async getCards(limit: number): Promise<TarotCard[]> {
     try {
-      const result = await this.client.submit(
-        'g.V().hasLabel("card").project("id","name","arcana","keywords","meaningUpright","meaningReversed","image").by(id()).by(values("name")).by(values("arcana")).by(values("keywords")).by(values("meaningUpright")).by(values("meaningReversed")).by(values("image"))'
-      );
+      const result = await this.client
+        .submit(
+        `g.V().hasLabel("card")
+          .limit(${limit})
+          .project("id","name","arcana","keywords","meaningUpright","meaningReversed","image")
+          .by(id())
+          .by(values("name"))
+          .by(values("arcana"))
+          .by(values("keywords"))
+          .by(values("meaningUpright"))
+          .by(values("meaningReversed"))
+          .by(values("image"))`
+       );
       const rows = result.toArray() as Array<Map<string, unknown>>;
 
       if (rows.length === 0) {
-        return TAROT_SEED;
+        return TAROT_SEED.slice(0, limit);
       }
 
       return rows.map((row, index) => {
@@ -36,6 +46,7 @@ export class TarotGraphService implements OnModuleDestroy {
           }
           return value as T | undefined;
         };
+        
 
         const seedFallbackId = TAROT_SEED[index % TAROT_SEED.length].id;
         const cardId = String(getFirst('id') ?? seedFallbackId);
@@ -54,7 +65,7 @@ export class TarotGraphService implements OnModuleDestroy {
     } catch (error) {
       this.logger.warn('JanusGraph недоступний, використовую локальні seed-дані.');
       this.logger.debug(String(error));
-      return TAROT_SEED;
+      return TAROT_SEED.slice(0, limit);;
     }
   }
 
