@@ -50,40 +50,23 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { fetchSpreadDefinitions } from '../services/api';
-import { setJsonLd, setSeoMeta } from '../seo/meta';
+import { buildFaqJsonLd, setJsonLd, setSeoMeta } from '../seo/meta';
+import { ORG_NAME, SPREAD_DEFAULT_DESCRIPTION } from '../constants/seo';
+import { SPREAD_SLUG_TO_TYPE, SPREAD_USE_CASE } from '../constants/spreads';
 import type { SpreadDefinition, SpreadType } from '../types';
 
 const props = defineProps<{ slug: string }>();
 const loading = ref(true);
 const spreadDefinition = ref<SpreadDefinition | null>(null);
 
-const slugToType: Record<string, SpreadType> = {
-  classic3: 'classic3',
-  'past-present-future': 'classic3',
-  pentagram5: 'pentagram5',
-  pentagram: 'pentagram5',
-  love5: 'love5',
-  'love-reading': 'love5',
-  career5: 'career5',
-  'career-reading': 'career5'
-};
-
 const seoDescription = computed(() => {
-  if (!spreadDefinition.value) return 'Онлайн-розклад Таро з поясненням позицій.';
+  if (!spreadDefinition.value) return SPREAD_DEFAULT_DESCRIPTION;
   return `${spreadDefinition.value.title} — онлайн-розклад на ${spreadDefinition.value.count} карт із поясненням кожної позиції та цілісним тлумаченням.`;
 });
 
 const useCase = computed(() => {
-  switch (spreadDefinition.value?.id) {
-    case 'love5':
-      return 'Цей розклад підходить для питань про стосунки, почуття, межі, очікування та приховану напругу між людьми.';
-    case 'career5':
-      return 'Цей розклад добре працює для професійних рішень, грошей, нових можливостей, ризиків і наступного практичного кроку.';
-    case 'pentagram5':
-      return 'Пентаграма балансу корисна, коли ситуація має кілька шарів: дії, емоції, думки, результат і внутрішній сенс.';
-    default:
-      return 'Класичний розклад із трьох карт допомагає швидко побачити минуле, поточний стан і найближчий напрямок розвитку.';
-  }
+  if (!spreadDefinition.value) return '';
+  return SPREAD_USE_CASE[spreadDefinition.value.id];
 });
 
 const faqItems = computed(() => {
@@ -104,27 +87,16 @@ const faqItems = computed(() => {
   ];
 });
 
-function buildFaqJsonLd() {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: faqItems.value.map((item) => ({
-      '@type': 'Question',
-      name: item.question,
-      acceptedAnswer: { '@type': 'Answer', text: item.answer }
-    }))
-  };
-}
-
 onMounted(async () => {
   const definitions = await fetchSpreadDefinitions();
-  const type = slugToType[props.slug] || props.slug as SpreadType;
+  const type = SPREAD_SLUG_TO_TYPE[props.slug] || props.slug as SpreadType;
   spreadDefinition.value = definitions.find((item) => item.id === type) || null;
   loading.value = false;
 
   if (spreadDefinition.value) {
+    const title = `${spreadDefinition.value.title} — онлайн-розклад Таро`;
     setSeoMeta({
-      title: `${spreadDefinition.value.title} — онлайн-розклад Таро`,
+      title,
       description: seoDescription.value,
       canonicalPath: `/spreads/${props.slug}`,
       type: 'article'
@@ -133,15 +105,15 @@ onMounted(async () => {
     setJsonLd('spread-page', {
       '@context': 'https://schema.org',
       '@type': 'Article',
-      headline: `${spreadDefinition.value.title} — онлайн-розклад Таро`,
+      headline: title,
       description: seoDescription.value,
-      author: { '@type': 'Organization', name: 'Таро Черіот' },
+      author: { '@type': 'Organization', name: ORG_NAME },
       mainEntityOfPage: `${window.location.origin}/spreads/${props.slug}`
     });
-    setJsonLd('spread-faq', buildFaqJsonLd());
+    setJsonLd('spread-faq', buildFaqJsonLd(faqItems.value));
   } else {
     setSeoMeta({
-      title: 'Розклад не знайдено — Таро Черіот',
+      title: `Розклад не знайдено — ${ORG_NAME}`,
       description: 'Сторінку розкладу Таро не знайдено.',
       canonicalPath: `/spreads/${props.slug}`
     });

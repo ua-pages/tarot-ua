@@ -74,3 +74,15 @@ export function setJsonLd(id: string, data: unknown) {
   }
   script.textContent = JSON.stringify(data);
 }
+
+export function buildFaqJsonLd(items: Array<{ question: string; answer: string }>) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: items.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: { '@type': 'Answer', text: item.answer }
+    }))
+  };
+}

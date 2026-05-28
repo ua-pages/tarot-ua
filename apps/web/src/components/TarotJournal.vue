@@ -66,7 +66,9 @@
 
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue';
-import type { CloudSpread, InterpretationTone } from '../types';
+import type { CloudSpread } from '../types';
+import { formatDate, groupItemsByMonth, pluralizeCards } from '../utils';
+import { TONE_LABELS } from '../constants/interpretation';
 
 const props = defineProps<{
   title: string;
@@ -82,39 +84,14 @@ const emit = defineEmits<{
 const expandedId = ref<string>('');
 const draftNotes = reactive<Record<string, string>>({});
 
-const groupedItems = computed(() => {
-  const formatter = new Intl.DateTimeFormat('uk-UA', { month: 'long', year: 'numeric' });
-  const groups = new Map<string, CloudSpread[]>();
-
-  props.items.forEach((item) => {
-    const month = formatter.format(new Date(item.createdAt));
-    groups.set(month, [...(groups.get(month) ?? []), item]);
-  });
-
-  return Array.from(groups.entries()).map(([month, items]) => ({ month, items }));
-});
+const groupedItems = computed(() => groupItemsByMonth(props.items));
 
 function toggle(id: string) {
   expandedId.value = expandedId.value === id ? '' : id;
 }
 
-function formatDate(date: string) {
-  return new Intl.DateTimeFormat('uk-UA', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(date));
-}
-
-function pluralizeCards(count: number) {
-  if (count === 1) return 'карта';
-  if (count >= 2 && count <= 4) return 'карти';
-  return 'карт';
-}
-
-function toneLabel(tone?: InterpretationTone) {
-  const labels: Record<InterpretationTone, string> = {
-    psychological: 'Психологічно',
-    mystic: 'Містично',
-    practical: 'Практично'
-  };
-  return tone ? labels[tone] : 'Без тону';
+function toneLabel(tone?: string) {
+  return tone && tone in TONE_LABELS ? TONE_LABELS[tone as keyof typeof TONE_LABELS] : 'Без тону';
 }
 
 function updateDraft(id: string, event: Event) {

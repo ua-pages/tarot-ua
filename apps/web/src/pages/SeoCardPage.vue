@@ -62,7 +62,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { fetchCards } from '../services/api';
-import { setJsonLd, setSeoMeta } from '../seo/meta';
+import { buildFaqJsonLd, setJsonLd, setSeoMeta } from '../seo/meta';
+import { CARD_DEFAULT_DESCRIPTION, CARD_DEFAULT_TITLE, ORG_NAME } from '../constants/seo';
 import type { TarotCard } from '../types';
 
 const props = defineProps<{ slug: string }>();
@@ -73,14 +74,14 @@ const isReversedPage = computed(() => props.slug.endsWith('-reversed'));
 const cleanSlug = computed(() => props.slug.replace(/-reversed$/, ''));
 
 const pageTitle = computed(() => {
-  if (!card.value) return 'Значення карти Таро';
+  if (!card.value) return CARD_DEFAULT_TITLE;
   return isReversedPage.value
     ? `Що означає перевернута ${card.value.name}`
     : `Значення карти ${card.value.name}`;
 });
 
 const pageDescription = computed(() => {
-  if (!card.value) return 'Повне значення карти Таро у прямому та перевернутому положенні.';
+  if (!card.value) return CARD_DEFAULT_DESCRIPTION;
   const base = isReversedPage.value ? card.value.meaningReversed : card.value.meaningUpright;
   return `${base} Ключові теми: ${card.value.keywords.join(', ')}.`;
 });
@@ -100,7 +101,7 @@ const careerMeaning = computed(() => {
 const advice = computed(() => {
   if (!card.value) return '';
   return isReversedPage.value
-    ? `Не тисни на ситуацію. Перевернута карта радить побачити блок, назвати його чесно й повернути собі опору через маленьку дію.`
+    ? 'Не тисни на ситуацію. Перевернута карта радить побачити блок, назвати його чесно й повернути собі опору через маленьку дію.'
     : `Використай енергію карти як напрямок: ${card.value.keywords.join(', ')}. Один ясний крок краще за десять тривожних сценаріїв.`;
 });
 
@@ -122,26 +123,15 @@ const faqItems = computed(() => {
   ];
 });
 
-function buildFaqJsonLd() {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: faqItems.value.map((item) => ({
-      '@type': 'Question',
-      name: item.question,
-      acceptedAnswer: { '@type': 'Answer', text: item.answer }
-    }))
-  };
-}
-
 onMounted(async () => {
   const cards = await fetchCards(78);
   card.value = cards.find((item) => item.id === cleanSlug.value) || null;
   loading.value = false;
 
   if (card.value) {
+    const title = `${pageTitle.value} — ${ORG_NAME}`;
     setSeoMeta({
-      title: `${pageTitle.value} — Таро Черіот`,
+      title,
       description: pageDescription.value,
       canonicalPath: `/meaning/${props.slug}`,
       image: card.value.image,
@@ -154,13 +144,13 @@ onMounted(async () => {
       headline: pageTitle.value,
       description: pageDescription.value,
       image: `${window.location.origin}${card.value.image}`,
-      author: { '@type': 'Organization', name: 'Таро Черіот' },
+      author: { '@type': 'Organization', name: ORG_NAME },
       mainEntityOfPage: `${window.location.origin}/meaning/${props.slug}`
     });
-    setJsonLd('card-faq', buildFaqJsonLd());
+    setJsonLd('card-faq', buildFaqJsonLd(faqItems.value));
   } else {
     setSeoMeta({
-      title: 'Карту не знайдено — Таро Черіот',
+      title: `Карту не знайдено — ${ORG_NAME}`,
       description: 'Сторінку значення карти не знайдено.',
       canonicalPath: `/meaning/${props.slug}`
     });

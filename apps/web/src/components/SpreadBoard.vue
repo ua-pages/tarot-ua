@@ -71,6 +71,7 @@
 import { ref } from 'vue';
 import type { DrawnCard, SpreadDefinition } from '../types';
 import { cardMeaning } from '../utils';
+import { CARD_REVEAL_DELAY_STEP, DETAIL_REVEAL_OFFSET, DETAIL_REVEAL_DELAY_STEP } from '../constants/animations';
 
 defineProps<{
   spread: DrawnCard[];
@@ -96,10 +97,10 @@ defineExpose({
 });
 
 function revealStyle(index: number) {
-  return { '--reveal-delay': `${index * 140}ms` };
+  return { '--reveal-delay': `${index * CARD_REVEAL_DELAY_STEP}ms` };
 }
 
 function detailRevealStyle(index: number) {
-  return { '--reveal-delay': `${520 + index * 95}ms` };
+  return { '--reveal-delay': `${DETAIL_REVEAL_OFFSET + index * DETAIL_REVEAL_DELAY_STEP}ms` };
 }
 </script>
