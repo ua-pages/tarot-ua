@@ -4,7 +4,7 @@ template.innerHTML = `
     <div class="section-head interpretation-head">
       <div>
         <p class="eyebrow">
-          AI-тлумачення
+          ШІ-тлумачення
           <span id="provider-pill" class="provider-pill" style="display:none"></span>
         </p>
         <h2>Цілісне прочитання розкладу</h2>

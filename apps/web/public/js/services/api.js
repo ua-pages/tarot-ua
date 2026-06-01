@@ -126,5 +126,5 @@ export async function fetchSpreadInterpretation(spread, type, tone = 'psychologi
     method: 'POST',
     headers: baseHeaders,
     body: JSON.stringify({ spread, type, tone })
-  }), 'Не вдалося згенерувати AI-тлумачення');
+  }), 'Не вдалося згенерувати ШІ-тлумачення');
 }

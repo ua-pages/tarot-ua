@@ -8,7 +8,7 @@ template.innerHTML = `
       <div>
         <p class="eyebrow">Tarot Journal</p>
         <h2 id="journal-title"></h2>
-        <p class="muted">Збережені розклади як особистий архів: карти, позиції, AI-тлумачення і твої нотатки.</p>
+        <p class="muted">Збережені розклади як особистий архів: карти, позиції, ШІ-тлумачення і твої нотатки.</p>
       </div>
       <span id="journal-count" class="journal-count"></span>
     </div>

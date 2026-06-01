@@ -304,7 +304,7 @@ async function getCardOfDay(date) {
 
 function generateRuleBasedInterpretation(spread, spreadType, tone) {
   if (!spread.length) {
-    return { title: 'AI-тлумачення', tone: tone || 'psychological', summary: 'Спершу зробіть розклад, щоб отримати цілісне тлумачення.', energy: 'Енергія ще не визначена.', interactions: [], advice: [], shadow: 'Тіньова зона з\'явиться після вибору карт.', nextStep: 'Оберіть розклад і відкрийте карти.', provider: 'rule-based' };
+    return { title: 'ШІ-тлумачення', tone: tone || 'psychological', summary: 'Спершу зробіть розклад, щоб отримати цілісне тлумачення.', energy: 'Енергія ще не визначена.', interactions: [], advice: [], shadow: 'Тіньова зона з\'явиться після вибору карт.', nextStep: 'Оберіть розклад і відкрийте карти.', provider: 'rule-based' };
   }
 
   const definition = resolveSpread(spread.length, spreadType);
@@ -320,7 +320,7 @@ function generateRuleBasedInterpretation(spread, spreadType, tone) {
   const dominantSuit = Object.entries(suits).sort((a, b) => b[1] - a[1])[0]?.[0] || 'змішана енергія';
 
   return {
-    title: `AI-тлумачення · ${definition.title}`,
+    title: `ШІ-тлумачення · ${definition.title}`,
     tone: normalizedTone,
     summary: buildSummary(spread, definition.title, normalizedTone, majorCount, reversedCount, dominantSuit),
     energy: buildEnergyLine(majorCount, reversedCount, uprightCount, dominantSuit),
@@ -385,7 +385,7 @@ async function generateLlmInterpretation({ spread, definition, tone, fallback })
           {
             role: 'system',
             content: [
-              'Ти український AI-інтерпретатор Таро для сучасного веб-додатку.',
+              'Ти український ШІ-інтерпретатор Таро для сучасного веб-додатку.',
               'Пиши українською, живо, тепло, глибоко, але без фаталізму.',
               'Не стверджуй майбутнє як факт. Формулюй як можливий напрям, символічну підказку або психологічний патерн.',
               'Не давай медичних, юридичних або фінансових гарантій.',
@@ -451,7 +451,7 @@ function parseJson(content) {
 function normalizeLlmResponse(value, fallback, tone) {
   const source = (typeof value === 'object' && value !== null) ? value : {};
   return {
-    title: stringValue(source.title, `LLM-тлумачення · ${fallback.title.replace(/^AI-тлумачення · /, '')}`),
+    title: stringValue(source.title, `LLM-тлумачення · ${fallback.title.replace(/^ШІ-тлумачення · /, '')}`),
     tone,
     summary: stringValue(source.summary, fallback.summary),
     energy: stringValue(source.energy, fallback.energy),

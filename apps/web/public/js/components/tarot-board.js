@@ -39,7 +39,7 @@ template.innerHTML = `
 
     <section id="premium-preview" class="panel premium-preview-panel" style="display:none">
       <p class="eyebrow">Premium preview</p>
-      <h2>Глибше AI-тлумачення</h2>
+      <h2>Глибше ШІ-тлумачення</h2>
       <p class="muted">Тут можна тестувати м'який upsell: розширений аналіз, персональні висновки, додаткові тони і довшу історію.</p>
       <button class="btn btn-secondary" type="button" id="premium-preview-btn">Подивитись можливості</button>
     </section>
