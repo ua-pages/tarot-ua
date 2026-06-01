@@ -26,8 +26,25 @@ export class AppRoot extends HTMLElement {
 
     void initAnalytics();
     void refreshFeatureFlags();
+    this.addCursorGlow();
 
     this.route();
+  }
+
+  addCursorGlow() {
+    const glow = document.createElement('div');
+    glow.className = 'mystic-cursor-glow';
+    glow.style.display = 'none';
+    document.body.appendChild(glow);
+
+    let timer;
+    document.addEventListener('mousemove', (e) => {
+      glow.style.display = '';
+      glow.style.left = `${e.clientX}px`;
+      glow.style.top = `${e.clientY}px`;
+      clearTimeout(timer);
+      timer = setTimeout(() => { glow.style.display = 'none'; }, 3000);
+    });
   }
 
   route() {

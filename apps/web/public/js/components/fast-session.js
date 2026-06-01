@@ -11,10 +11,13 @@ const SPREAD_META = [
   { id: 'career5', icon: '⚜', name: 'Карʼєра', kicker: 'Шлях' }
 ];
 
+const RUNES = ['ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ', 'ᚲ', 'ᚷ', 'ᚹ', 'ᚺ', 'ᚾ', 'ᛁ', 'ᛃ', 'ᛇ', 'ᛈ', 'ᛉ', 'ᛊ', 'ᛏ', 'ᛒ', 'ᛖ', 'ᛗ', 'ᛚ', 'ᛝ', 'ᛟ', 'ᛞ'];
+
 const template = document.createElement('template');
 template.innerHTML = `
   <div class="mystic-backdrop" aria-hidden="true"></div>
-  <main class="mystic-page">
+  <div class="mystic-runes" aria-hidden="true"></div>
+  <main class="mystic-page page-enter">
     <section class="mystic-hero">
       <h1>Швидка містична сесія</h1>
       <p class="subtitle">Оберіть практику — карти самі розкажуть історію. Жодної реєстрації, лише ви і символи.</p>
@@ -46,7 +49,13 @@ template.innerHTML = `
     </section>
 
     <div class="mystic-loading" id="loading-indicator" style="display:none">
-      <div class="mystic-spinner"></div>
+      <div class="mystic-loading-cards">
+        <div class="mystic-loading-card-back"></div>
+        <div class="mystic-loading-card-back"></div>
+        <div class="mystic-loading-card-back"></div>
+        <div class="mystic-loading-card-back"></div>
+        <div class="mystic-loading-card-back"></div>
+      </div>
       <span>Карти відкриваються...</span>
     </div>
 
@@ -74,10 +83,30 @@ export class FastSession extends HTMLElement {
     await adoptStyles(this);
     this.bindEvents();
     this.drawSpreadGrid();
+    this.spawnRunes();
     try {
       this.spreadDefinitions = await fetchSpreadDefinitions();
     } catch {}
     this.tryRestoreSession();
+  }
+
+  disconnectedCallback() {
+    this._cleanup?.();
+  }
+
+  spawnRunes() {
+    const container = this.shadowRoot.querySelector('.mystic-runes');
+    const symbols = ['ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ', 'ᚲ', 'ᚷ', 'ᚹ', 'ᚺ', 'ᚾ', 'ᛁ', 'ᛃ', 'ᛇ', 'ᛈ', 'ᛉ', 'ᛊ', 'ᛏ', 'ᛒ', 'ᛖ', 'ᛗ', 'ᛚ', 'ᛝ', 'ᛟ', 'ᛞ', '☽', '☾', '✧', '✦', '♰', '⚜'];
+    for (let i = 0; i < 12; i++) {
+      const el = document.createElement('span');
+      el.className = 'mystic-rune';
+      el.textContent = symbols[i % symbols.length];
+      el.style.left = `${Math.random() * 100}%`;
+      el.style.fontSize = `${0.7 + Math.random() * 1.2}rem`;
+      el.style.setProperty('--duration', `${15 + Math.random() * 25}s`);
+      el.style.setProperty('--delay', `${Math.random() * 20}s`);
+      container.appendChild(el);
+    }
   }
 
   bindEvents() {
@@ -104,6 +133,11 @@ export class FastSession extends HTMLElement {
 
     grid.querySelectorAll('.mystic-spread-card').forEach((card) => {
       card.addEventListener('click', () => this.selectSpread(card.dataset.id));
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty('--mouse-x', `${((e.clientX - rect.left) / rect.width) * 100}%`);
+        card.style.setProperty('--mouse-y', `${((e.clientY - rect.top) / rect.height) * 100}%`);
+      });
     });
   }
 
@@ -129,6 +163,7 @@ export class FastSession extends HTMLElement {
     if (this.loading) return;
     this.activeSpreadType = type;
     this.highlightSelected();
+    this.shuffleAnimation();
     this.loading = true;
     this.showLoading(true);
 
@@ -136,25 +171,43 @@ export class FastSession extends HTMLElement {
       const definition = this.spreadDefinitions.find((d) => d.id === type);
       const [drawnCards] = await Promise.all([
         drawSpread(definition?.count ?? 3, type),
-        delay(400)
+        delay(600)
       ]);
       this.spread = drawnCards;
       saveSpreadSession({ spreadType: type, spread: drawnCards });
       trackEvent('fast_spread_drawn', { spreadType: type, cardsCount: drawnCards.length });
 
       this.renderSpread();
+      this.glowPanel('cards-section');
 
       const interp = await fetchSpreadInterpretation(drawnCards, type, 'psychological');
       this.interpretation = interp;
       saveInterpretationSession(interp);
 
       this.renderInterpretation();
+      this.glowPanel('interpretation-section');
       trackEvent('fast_interpretation_generated', { spreadType: type, provider: interp.provider });
     } catch (err) {
       this.showError(err instanceof Error ? err.message : 'Щось пішло не так');
     } finally {
       this.loading = false;
       this.showLoading(false);
+    }
+  }
+
+  shuffleAnimation() {
+    const grid = this.shadowRoot.getElementById('spread-grid');
+    grid.querySelectorAll('.mystic-spread-card').forEach((card) => {
+      card.classList.add('mystic-shuffling');
+      setTimeout(() => card.classList.remove('mystic-shuffling'), 2000);
+    });
+  }
+
+  glowPanel(id) {
+    const panel = this.shadowRoot.getElementById(id);
+    if (panel) {
+      panel.classList.add('glow');
+      setTimeout(() => panel.classList.remove('glow'), 3000);
     }
   }
 
@@ -181,7 +234,7 @@ export class FastSession extends HTMLElement {
     `).join('');
 
     status.textContent = '';
-    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
   }
 
   renderInterpretation() {
@@ -189,6 +242,7 @@ export class FastSession extends HTMLElement {
     const section = this.shadowRoot.getElementById('interpretation-section');
     const content = this.shadowRoot.getElementById('interp-content');
     section.style.display = '';
+    content.className = 'mystic-interp revealing';
 
     const interp = this.interpretation;
     let html = '';
@@ -218,7 +272,7 @@ export class FastSession extends HTMLElement {
     }
 
     content.innerHTML = html || '<p style="color:rgba(200,185,230,0.5);text-align:center">Тлумачення готується...</p>';
-    section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
   }
 
   showLoading(show) {
