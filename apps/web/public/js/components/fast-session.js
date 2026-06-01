@@ -254,21 +254,6 @@ export class FastSession extends HTMLElement {
     return icons[tag] || '🌊';
   }
 
-  extractKeyMessage(text) {
-    if (!text) return '';
-    const cleaned = text.replace(/<[^>]+>/g, '');
-    const sentences = cleaned.match(/[^.!?]+[.!?]+/g) || [cleaned];
-    return sentences.slice(0, 2).join(' ').trim();
-  }
-
-  shortInsight(text) {
-    if (!text) return '';
-    const cleaned = text.replace(/<[^>]+>/g, '');
-    const words = cleaned.split(/\s+/).filter(Boolean);
-    if (words.length <= 15) return cleaned;
-    return words.slice(0, 15).join(' ') + '…';
-  }
-
   renderInterpretation() {
     if (!this.interpretation) return;
     const section = this.shadowRoot.getElementById('interpretation-section');
@@ -277,25 +262,56 @@ export class FastSession extends HTMLElement {
     content.className = 'mystic-interp revealing';
 
     const interp = this.interpretation;
-    const energyTag = this.energyTag(interp.energy);
-    const keyMsg = this.extractKeyMessage(interp.summary);
-    const energyShort = interp.energy ? interp.energy.replace(/<[^>]+>/g, '').split(/[.;]/)[0] : '';
-    const cardGlances = (this.spread || []).map((item) => `
-      <div class="mystic-card-glance-item">
-        <span class="mini-icon">${item.reversed ? '⇄' : '🂠'}</span>
-        <div class="mini-position">${item.position}</div>
-        <span class="mini-name">${item.card.name}</span>
-        <div class="mini-insight">${this.shortInsight(cardMeaning(item))}</div>
-      </div>
-    `).join('');
 
-    let glanceHtml = `
-      <div class="mystic-quick-glance">
-        <div class="mystic-glance-row">
-          <span class="mystic-energy-badge ${energyTag}">${this.energyIcon(energyTag)} ${energyShort}</span>
+    const energyTag = this.energyTag(interp.energy);
+    const energyIcon = this.energyIcon(energyTag);
+    const energyShort = interp.energy
+      ? interp.energy.replace(/<[^>]+>/g, '').split(/[.;]/)[0].trim()
+      : '';
+
+    const firstSentence = (html) => {
+      const t = html.replace(/<[^>]+>/g, '').trim();
+      const m = t.match(/^[^.!?]+[.!?]+/);
+      return m ? m[0].trim() : t.slice(0, 120);
+    };
+
+    const cardFragments = (this.spread || []).map((item) =>
+      `<div class="post-fragment">
+        <span class="post-label">${item.position}</span>
+        <span class="post-card-name">${item.card.name}${item.reversed ? ' ⇄' : ''}</span>
+        <span class="post-insight">${firstSentence(cardMeaning(item))}</span>
+      </div>`
+    ).join('');
+
+    const interactionsFragments = Array.isArray(interp.interactions)
+      ? interp.interactions.map((i) =>
+          `<div class="post-fragment post-interaction">${firstSentence(i)}</div>`
+        ).join('')
+      : '';
+
+    const adviceFragments = Array.isArray(interp.advice)
+      ? interp.advice.map((a) =>
+          `<div class="post-fragment post-advice">${firstSentence(a)}</div>`
+        ).join('')
+      : interp.advice
+        ? `<div class="post-fragment post-advice">${firstSentence(interp.advice)}</div>`
+        : '';
+
+    const shadowFragment = interp.shadow
+      ? `<div class="post-fragment post-shadow">${firstSentence(interp.shadow)}</div>`
+      : '';
+
+    const fragmentHtml = `
+      <div class="post-mode" id="post-mode">
+        <div class="post-header">
+          <span class="post-energy ${energyTag}">${energyIcon} ${energyShort || 'енергія'}</span>
+          <span class="post-summary-preview">${firstSentence(interp.summary)}</span>
         </div>
-        <div class="mystic-key-message">${keyMsg || interp.summary || ''}</div>
-        ${cardGlances ? `<div class="mystic-card-glance">${cardGlances}</div>` : ''}
+        <div class="post-divider"></div>
+        ${cardFragments}
+        ${interactionsFragments ? `<div class="post-divider"></div>${interactionsFragments}` : ''}
+        ${adviceFragments ? `<div class="post-divider"></div>${adviceFragments}` : ''}
+        ${shadowFragment ? `<div class="post-divider"></div>${shadowFragment}` : ''}
       </div>
     `;
 
@@ -326,24 +342,41 @@ export class FastSession extends HTMLElement {
     }
 
     content.innerHTML = `
-      ${glanceHtml}
-      <button class="mystic-full-toggle" id="full-toggle">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-        Читати повне тлумачення
-      </button>
-      <div class="mystic-full-text" id="full-text">
+      <div class="post-view" id="post-view">
+        ${fragmentHtml}
+      </div>
+      <div class="detail-view" id="detail-view" style="display:none">
         ${fullHtml || '<p style="color:rgba(200,185,230,0.5);text-align:center">Тлумачення готується...</p>'}
+      </div>
+      <div class="post-toggle-bar">
+        <button class="post-toggle-btn active" id="toggle-frag">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+          Стисло
+        </button>
+        <button class="post-toggle-btn" id="toggle-detail">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+          Детально
+        </button>
       </div>
     `;
 
-    const toggle = content.querySelector('#full-toggle');
-    const fullText = content.querySelector('#full-text');
-    if (toggle && fullText) {
-      toggle.addEventListener('click', () => {
-        const open = fullText.classList.toggle('open');
-        toggle.innerHTML = open
-          ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/></svg> Згорнути тлумачення`
-          : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> Читати повне тлумачення`;
+    const fragView = content.querySelector('#post-view');
+    const detailView = content.querySelector('#detail-view');
+    const fragBtn = content.querySelector('#toggle-frag');
+    const detailBtn = content.querySelector('#toggle-detail');
+
+    if (fragBtn && detailBtn && fragView && detailView) {
+      fragBtn.addEventListener('click', () => {
+        fragView.style.display = '';
+        detailView.style.display = 'none';
+        fragBtn.classList.add('active');
+        detailBtn.classList.remove('active');
+      });
+      detailBtn.addEventListener('click', () => {
+        fragView.style.display = 'none';
+        detailView.style.display = '';
+        detailBtn.classList.add('active');
+        fragBtn.classList.remove('active');
       });
     }
 
