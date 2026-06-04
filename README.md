@@ -1,181 +1,119 @@
-# Tarot Atlas (Пет-проєкт для портфоліо)
+# Tarot Atlas (пет-проєкт для портфоліо)
 
-Повноцінний full-stack застосунок про карти Таро на стеку:
-- Vue 3 + Vite + TypeScript
-- NestJS + TypeScript
-- JanusGraph (Gremlin)
-- Jasmine (unit тести)
+Повноцінний full-stack застосунок про карти Таро українською мовою.
 
-## Що вже реалізовано
+**Стек:**
+- Бекенд: Node.js (vanilla HTTP), PostgreSQL, Gremlin (JanusGraph)
+- Фронтенд: vanilla JS (Web Components), SPA з серверним рендерингом
+- ШІ-тлумачення: OpenRouter / OpenAI (опціонально)
 
-- Web UI українською мовою:
-  - "Карта дня"
-  - розклад на 3 карти
-  - прев'ю колоди з ілюстраціями
-- API ендпойнти:
-  - `GET /health`
-  - `GET /tarot/cards`
-  - `GET /tarot/draw?count=3`
-  - `GET /tarot/card-of-day`
-- Інтеграція з JanusGraph:
-  - читання карт із графа
-  - fallback на локальні seed-дані, якщо граф недоступний
-- Hot Reload у дев-режимі:
-  - фронтенд через Vite HMR
-  - бекенд через `nodemon` (перезапуск при зміні `src/**/*.ts`)
+## Можливості
 
-## Структура проєкту
+- **Карта дня** — детерміністична карта на кожен день
+- **Розклади:** 3 карти («Минуле·Теперішнє·Майбутнє»), Пентаграма балансу (5 карт), Кохання та стосунки (5), Кар'єра та гроші (5)
+- **ШІ-тлумачення** — цілісний аналіз розкладу через LLM (OpenRouter/OpenAI), з трьома тонами: психологічний, містичний, практичний; якщо ключ API не налаштовано — працює rule-based інтерпретатор
+- **Бібліотека карт** — 78 карт з ілюстраціями, значеннями й ключовими словами
+- **Авторизація** — JWT (реєстрація, логін, профіль)
+- **Журнал розкладів** — збереження, нотатки, обране
+- **Публічні розклади** — share за slug + соціальна картка SVG
+- **Аналітика** — PostHog (опціонально, без ключа працює без неї)
 
-- `apps/api` - NestJS API
-- `apps/web` - Vue + Vite клієнт
-- `infra` - локальна інфраструктура (`docker-compose` для JanusGraph)
+## Структура
+
+- `apps/api` — Node.js API (vanilla HTTP, PostgreSQL, Gremlin)
+- `apps/web` — vanilla JS SPA (Web Components)
+- `infra` — docker-compose (PostgreSQL + Gremlin Server)
 
 ## Швидкий старт
 
-1. Встановити залежності
-
 ```bash
+# 1. Встановити залежності
 npm install
-```
 
-2. (Опціонально) Запустити JanusGraph
-
-```bash
+# 2. (Опціонально) Запустити PostgreSQL + Gremlin
 docker compose -f infra/docker-compose.yml up -d
+
+# 3. Запустити API
+node apps/api/server.js
+
+# 4. В іншому терміналі — фронтенд
+node apps/web/server.js
 ```
 
-3. Запустити API + Web паралельно
+- **Web:** `http://localhost:5173`
+- **API:** `http://localhost:3000`
+
+Або через root `package.json`:
 
 ```bash
-npm run dev
+npm start     # фронтенд
+npm start:api # API
 ```
 
-- Web: `http://localhost:5173`
-- API: `http://localhost:3000`
+## API endpoints
 
-## Скрипти
+| Метод | Шлях | Опис |
+|-------|------|------|
+| GET | `/api/health` | Перевірка API |
+| GET | `/api/auth/health` | Перевірка auth |
+| POST | `/api/auth/register` | Реєстрація |
+| POST | `/api/auth/login` | Логін |
+| GET | `/api/auth/me` | Профіль (auth) |
+| GET | `/api/tarot/cards` | Список карт |
+| GET | `/api/tarot/spreads` | Визначення розкладів |
+| GET | `/api/tarot/draw?count=3&type=classic3` | Випадковий розклад |
+| POST | `/api/tarot/interpretation` | ШІ-тлумачення |
+| GET | `/api/tarot/card-of-day` | Карта дня |
+| GET/POST | `/api/me/spreads` | Журнал розкладів (auth) |
+| PATCH | `/api/me/spreads/:id/favorite` | Обране (auth) |
+| PATCH | `/api/me/spreads/:id/note` | Нотатка (auth) |
+| POST | `/api/share/spreads` | Створити публічний розклад |
+| GET | `/api/share/spreads/:slug` | Отримати публічний розклад |
+| GET | `/api/share/spreads/:slug/social-card.svg` | Social card |
 
-```bash
-npm run dev     # API + Web (hot reload)
-npm run build   # build API + Web
-npm run test    # jasmine тести для API + Web
-```
+## PostgreSQL
 
-## JanusGraph
-
-- Endpoint за замовчуванням: `ws://localhost:8182/gremlin`
-- Можна перевизначити змінною:
-
-```bash
-JANUSGRAPH_ENDPOINT=ws://your-host:8182/gremlin
-```
-
-Якщо JanusGraph недоступний, API продовжує працювати на локальному seed-наборі карт.
-
-## Що можна додати далі
-
-- історію розкладів для користувача
-- ребра зв'язків між картами (`influences`, `mirrors`, `blocks`)
-- E2E тести і CI
-- перемикач мов (UA/EN)
-
-## Auth v2 + Cloud sync
-
-Ця версія додає production-like MVP авторизації:
-
-- JWT auth (`/api/auth/register`, `/api/auth/login`, `/api/auth/me`)
-- PostgreSQL через TypeORM
-- профіль користувача з `premiumTier`
-- cloud history для розкладів (`/api/me/spreads`)
-- favorites через `favorite=true`
-- `.env.example` з базовими змінними
-
-### Запуск PostgreSQL
-
-```bash
-docker compose -f infra/docker-compose.yml up -d postgres
-```
-
-### Запуск проєкту
-
-```bash
-npm install
-npm run dev
-```
-
-Для dev-режиму TypeORM `synchronize=true`. Для production краще вимкнути `TYPEORM_SYNC=false` і додати міграції.
-
-
-## Auth/API routes note
-
-Backend now uses a global `/api` prefix. Test routes directly with:
-
-```bash
-curl http://localhost:3000/api/health
-curl http://localhost:3000/api/auth/health
-curl -X POST http://localhost:3000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@test.com","password":"password123","name":"Test"}'
-```
-
-Vite proxies `/api/*` to `http://localhost:3000/api/*` without rewriting.
-
-If routes still look missing, kill the old process on port 3000:
-
-```bash
-lsof -ti :3000 | xargs kill -9
-```
-
-
-## Shareable spreads
-
-Публічні розклади працюють через PostgreSQL.
-
-```bash
-docker compose up -d db
-npm run dev
-```
-
-Перевірка API:
-
-```bash
-curl http://localhost:3000/api/share/spreads/non-existent
-```
-
-У застосунку натисни **📸 Поділитись** біля поточного розкладу. Буде створено:
-
-- short URL: `/share/:slug`
-- PNG preview у браузері
-- social card SVG: `/api/share/spreads/:slug/social-card.svg`
-
-## Analytics
-
-The web app supports optional PostHog analytics with graceful no-key fallback.
-
-Create `apps/web/.env`:
+Endpoints за замовчуванням — `localhost:5432`. Змінні середовища:
 
 ```env
-VITE_POSTHOG_KEY=phc_your_project_key
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_USER=tarot
+POSTGRES_PASSWORD=tarot
+POSTGRES_DB=tarot
+```
+
+## JanusGraph (Gremlin)
+
+Endpoint за замовчуванням — `ws://localhost:8182/gremlin`.
+Якщо JanusGraph недоступний, API працює на локальному seed-наборі карт.
+
+## ШІ-тлумачення
+
+Підтримується OpenRouter та OpenAI-сумісні API. Налаштування:
+
+```env
+OPENROUTER_API_KEY=sk-or-...
+LLM_API_URL=https://openrouter.ai/api/v1/chat/completions
+LLM_MODEL=openai/gpt-4o-mini
+```
+
+Якщо ключ не вказано — застосунок використовує rule-based тлумачення.
+
+## Аналітика
+
+Опціональна аналітика через PostHog. Файл `apps/web/.env`:
+
+```env
+VITE_POSTHOG_KEY=phc_...
 VITE_POSTHOG_HOST=https://eu.i.posthog.com
 VITE_ANALYTICS_ENABLED=true
 ```
 
-Tracked events include:
+Для вимкнення: `localStorage['tarot-analytics-opt-out'] = 'true'`.
 
-- `app_opened`
-- `ritual_start_clicked`
-- `spread_selected`
-- `reading_generated`
-- `ai_interpretation_generated`
-- `interpretation_tone_changed`
-- `share_clicked`
-- `share_link_created`
-- `native_share_completed`
-- `share_url_copied`
-- `favorite_added`
-- `login_completed`
-- `registration_completed`
-- `daily_card_opened`
-- `deck_toggled`
+## Що можна додати
 
-Session replay is enabled in PostHog, with input masking for email/password fields. Users can opt out by setting `localStorage['tarot-analytics-opt-out'] = 'true'`.
+- ребра зв'язків між картами (`influences`, `mirrors`, `blocks`)
+- E2E тести
+- перемикач мов (UA/EN)
