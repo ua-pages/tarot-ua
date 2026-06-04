@@ -348,7 +348,7 @@ async function generateLlmInterpretation({ spread, definition, tone, fallback })
 
     if (!response.ok) {
       const details = await response.text().catch(() => '');
-      console.warn(`LLM request failed: ${response.status} ${details.slice(0, 300)}`);
+      console.warn(`LLM-запит не вдався: ${response.status} ${details.slice(0, 300)}`);
       return null;
     }
 
@@ -359,7 +359,7 @@ async function generateLlmInterpretation({ spread, definition, tone, fallback })
     const parsed = parseJson(content);
     return normalizeLlmResponse(parsed, fallback, tone);
   } catch (error) {
-    console.warn(`LLM interpretation fallback used: ${error.message}`);
+    console.warn(`LLM-тлумачення — використано запасний варіант: ${error.message}`);
     return null;
   }
 }

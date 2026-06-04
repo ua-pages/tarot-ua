@@ -6,7 +6,7 @@ template.innerHTML = `
   <section class="panel journal-panel" style="display:none">
     <div class="section-head">
       <div>
-        <p class="eyebrow">Tarot Journal</p>
+        <p class="eyebrow">Щоденник Таро</p>
         <h2 id="journal-title"></h2>
         <p class="muted">Збережені розклади як особистий архів: карти, позиції, ШІ-тлумачення і твої нотатки.</p>
       </div>
@@ -127,7 +127,7 @@ export class TarotJournal extends HTMLElement {
         interpDiv.className = 'journal-interpretation';
         interpDiv.innerHTML = `
           <div class="journal-meta-row">
-            <span>${entry.interpretation.provider === 'llm' ? 'LLM' : 'Fallback'}</span>
+            <span>${entry.interpretation.provider === 'llm' ? 'ШІ' : 'Запасний варіант'}</span>
             <span>${this.toneLabel(entry.interpretation.tone)}</span>
           </div>
           <h4>${entry.interpretation.title}</h4>

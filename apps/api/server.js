@@ -61,13 +61,13 @@ async function router(req, res) {
   const method = req.method;
 
   try {
-    // Health
+    // Здоров'я
     if (method === 'GET' && path === '/api/health') {
       jsonResponse(res, 200, { ok: true, service: 'tarot-api', timestamp: new Date().toISOString() });
       return;
     }
 
-    // Tarot cards
+    // Список карт
     if (method === 'GET' && path === '/api/tarot/cards') {
       const count = Number(url.searchParams.get('count') || 78);
       const result = cards.getCards(count);
@@ -75,13 +75,13 @@ async function router(req, res) {
       return;
     }
 
-    // Tarot spreads (definitions)
+    // Визначення розкладів
     if (method === 'GET' && path === '/api/tarot/spreads') {
       jsonResponse(res, 200, cards.getSpreadDefinitions());
       return;
     }
 
-    // Tarot draw
+    // Випадковий розклад
     if (method === 'GET' && path === '/api/tarot/draw') {
       const count = Number(url.searchParams.get('count') || 3);
       const type = url.searchParams.get('type') || undefined;
@@ -90,7 +90,7 @@ async function router(req, res) {
       return;
     }
 
-    // Tarot interpretation
+    // ШІ-тлумачення
     if (method === 'POST' && path === '/api/tarot/interpretation') {
       const body = await parseBody(req);
       const result = await cards.generateInterpretation(body.spread || [], body.type, body.tone);
@@ -98,7 +98,7 @@ async function router(req, res) {
       return;
     }
 
-    // Tarot card of day
+    // Карта дня
     if (method === 'GET' && path === '/api/tarot/card-of-day') {
       const dateStr = url.searchParams.get('date');
       const date = dateStr ? new Date(dateStr) : new Date();
@@ -108,7 +108,7 @@ async function router(req, res) {
       return;
     }
 
-    // Share spreads create
+    // Створити публічний розклад
     if (method === 'POST' && path === '/api/share/spreads') {
       const body = await parseBody(req);
       const origin = req.headers.origin || '';
@@ -117,7 +117,7 @@ async function router(req, res) {
       return;
     }
 
-    // Share spreads social card SVG
+    // Картка для соцмереж
     const svgMatch = path.match(/^\/api\/share\/spreads\/([A-Za-z0-9_-]+)\/social-card\.svg$/);
     if (method === 'GET' && svgMatch) {
       const spread = await share.findBySlug(svgMatch[1]);
@@ -130,7 +130,7 @@ async function router(req, res) {
       return;
     }
 
-    // Share spreads get by slug
+    // Отримати публічний розклад
     const slugMatch = path.match(/^\/api\/share\/spreads\/([A-Za-z0-9_-]+)$/);
     if (method === 'GET' && slugMatch) {
       const spread = await share.findBySlug(slugMatch[1]);
@@ -146,7 +146,7 @@ async function router(req, res) {
     const status = error.statusCode || 500;
     const message = status === 500 ? 'Внутрішня помилка сервера' : error.message;
     if (status === 500) {
-      console.error('Unhandled error:', error);
+      console.error('Невідома помилка:', error);
     }
     jsonResponse(res, status, { message });
   }

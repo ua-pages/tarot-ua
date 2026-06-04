@@ -152,7 +152,7 @@ export class InterpretationPanel extends HTMLElement {
     const providerPill = this.shadowRoot.getElementById('provider-pill');
     if (this._interpretation.provider) {
       providerPill.style.display = '';
-      providerPill.textContent = this._interpretation.provider === 'llm' ? 'LLM' : 'fallback';
+        providerPill.textContent = this._interpretation.provider === 'llm' ? 'ШІ' : 'запасний варіант';
     } else {
       providerPill.style.display = 'none';
     }

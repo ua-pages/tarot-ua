@@ -119,7 +119,7 @@ export class JournalPage extends HTMLElement {
     const interpHtml = entry.interpretation ? `
       <div class="journal-interpretation">
         <div class="journal-meta-row">
-          <span>${entry.interpretation.provider === 'llm' ? 'LLM' : 'Fallback'}</span>
+          <span>${entry.interpretation.provider === 'llm' ? 'ШІ' : 'Запасний варіант'}</span>
           <span>${toneLabel}</span>
         </div>
         <h4>${entry.interpretation.title}</h4>

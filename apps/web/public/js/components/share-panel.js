@@ -4,7 +4,7 @@ template.innerHTML = `
     <div class="share-copy">
       <p class="eyebrow">Публічний розклад</p>
       <h3>Готово до поширення</h3>
-      <p class="muted">Створено short URL, social card і PNG preview для месенджерів або соцмереж.</p>
+      <p class="muted">Створено коротке посилання, картку для соцмереж і зображення для попереднього перегляду.</p>
       <div class="share-url-row">
         <input id="share-url" class="share-url" readonly />
         <button id="copy-url-btn" class="btn btn-secondary">Копіювати URL</button>
@@ -12,10 +12,10 @@ template.innerHTML = `
       <div class="share-actions">
         <button id="native-share-btn" class="btn btn-ghost">Системно поділитись</button>
         <a id="download-link" class="btn btn-ghost share-download" download="tarot-spread.png" style="display:none">Завантажити PNG</a>
-        <a id="social-link" class="btn btn-ghost share-download" target="_blank" rel="noreferrer" style="display:none">Social card SVG</a>
+        <a id="social-link" class="btn btn-ghost share-download" target="_blank" rel="noreferrer" style="display:none">Картка для соцмереж (SVG)</a>
       </div>
     </div>
-    <img id="preview-img" class="share-preview" src="" alt="Прев'ю розкладу для поширення" style="display:none" />
+    <img id="preview-img" class="share-preview" src="" alt="Попередній перегляд розкладу для поширення" style="display:none" />
   </aside>
 `;
 
