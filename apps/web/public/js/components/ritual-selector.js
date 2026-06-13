@@ -1,105 +1,99 @@
-import { spreadMeta } from '../constants/spreads.js';
+import { Komponent, vyznachyty } from '../lib/karbovanets/core/src/index.js'
+import { adoptStyles } from '../shared-styles.js'
+import { spreadMeta } from '../constants/spreads.js'
 
-const template = document.createElement('template');
-template.innerHTML = `
-  <section id="ritual-section" class="panel controls-panel ritual-panel">
-    <div class="ritual-head practice-head">
-      <div>
-        <p class="eyebrow">Спосіб тихої сесії</p>
-        <h2>Якою буде ваша практика?</h2>
-        <p class="muted">Не шукайте "правильний" варіант. Оберіть той ритм, який сьогодні відчувається спокійніше.</p>
-      </div>
-      <button id="expand-btn" class="btn btn-ghost" type="button" style="display:none">Змінити практику</button>
-    </div>
-    <div id="selector-grid" class="spread-selector spread-selector-v2 practice-grid"></div>
-    <div id="active-summary" class="active-ritual-summary active-practice-summary" style="display:none"></div>
-  </section>
-`;
-
-import { adoptStyles } from '../shared-styles.js';
-
-export class RitualSelector extends HTMLElement {
+export class RitualSelector extends Komponent {
   constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
-    this.shadowRoot.appendChild(template.content.cloneNode(true));
-
-    this._definitions = [];
-    this._activeType = 'classic3';
-    this._collapsed = false;
-    this._loading = false;
+    super()
+    this._vyznachennya = []
+    this._aktyvnyyTyp = 'classic3'
+    this._zghornuto = false
+    this._zavantazhennya = false
   }
 
-  async connectedCallback() {
-    await adoptStyles(this);
-    this.shadowRoot.getElementById('expand-btn').addEventListener('click', () => {
-      this._collapsed = false;
-      this.updateUI();
-      this.dispatchEvent(new CustomEvent('expand'));
-    });
+  vyvesty() {
+    return `
+      <section id="ritual-section" class="panel controls-panel ritual-panel">
+        <div class="ritual-head practice-head">
+          <div>
+            <p class="eyebrow">Спосіб тихої сесії</p>
+            <h2>Якою буде ваша практика?</h2>
+            <p class="muted">Не шукайте "правильний" варіант. Оберіть той ритм, який сьогодні відчувається спокійніше.</p>
+          </div>
+          <button id="expand-btn" class="btn btn-ghost" type="button" style="display:none">Змінити практику</button>
+        </div>
+        <div id="selector-grid" class="spread-selector spread-selector-v2 practice-grid"></div>
+        <div id="active-summary" class="active-ritual-summary active-practice-summary" style="display:none"></div>
+      </section>
+    `
+  }
+
+  async prykripleno() {
+    await adoptStyles(this)
+    this.znayty('expand-btn').addEventListener('click', () => {
+      this._zghornuto = false
+      this.onovlytyUI()
+      this.vyslaty('expand')
+    })
   }
 
   set definitions(val) {
-    this._definitions = val;
-    this.updateUI();
+    this._vyznachennya = val
+    this.onovlytyUI()
   }
 
   set activeType(val) {
-    this._activeType = val;
-    this.updateUI();
+    this._aktyvnyyTyp = val
+    this.onovlytyUI()
   }
 
   set collapsed(val) {
-    this._collapsed = val;
-    this.updateUI();
+    this._zghornuto = val
+    this.onovlytyUI()
   }
 
   set loading(val) {
-    this._loading = val;
-    this.updateUI();
+    this._zavantazhennya = val
+    this.onovlytyUI()
   }
 
-  scrollIntoView() {
-    this.shadowRoot.getElementById('ritual-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
+  onovlytyUI() {
+    const sektsiya = this.znayty('ritual-section')
+    const sitka = this.znayty('selector-grid')
+    const rozhornuty = this.znayty('expand-btn')
+    const sumary = this.znayty('active-summary')
 
-  updateUI() {
-    const section = this.shadowRoot.getElementById('ritual-section');
-    const grid = this.shadowRoot.getElementById('selector-grid');
-    const expandBtn = this.shadowRoot.getElementById('expand-btn');
-    const summary = this.shadowRoot.getElementById('active-summary');
+    sektsiya.classList.toggle('collapsed', this._zghornuto)
+    rozhornuty.style.display = this._zghornuto ? '' : 'none'
 
-    section.classList.toggle('collapsed', this._collapsed);
-    expandBtn.style.display = this._collapsed ? '' : 'none';
-
-    if (this._collapsed) {
-      grid.style.display = 'none';
-      const activeDef = this._definitions.find((d) => d.id === this._activeType);
-      if (activeDef) {
-        const meta = spreadMeta(activeDef.id);
-        summary.style.display = 'flex';
-        summary.innerHTML = `
+    if (this._zghornuto) {
+      sitka.style.display = 'none'
+      const aktyvne = this._vyznachennya.find((d) => d.id === this._aktyvnyyTyp)
+      if (aktyvne) {
+        const meta = spreadMeta(aktyvne.id)
+        sumary.style.display = 'flex'
+        sumary.innerHTML = `
           <span>${meta.icon}</span>
           <div>
             <strong>${meta.title}</strong>
             <small>${meta.description}</small>
           </div>
-        `;
+        `
       }
     } else {
-      grid.style.display = '';
-      summary.style.display = 'none';
-      this.renderGrid(grid);
+      sitka.style.display = ''
+      sumary.style.display = 'none'
+      this.namalyuvatySitku(sitka)
     }
   }
 
-  renderGrid(container) {
-    container.innerHTML = '';
-    this._definitions.forEach((def) => {
-      const meta = spreadMeta(def.id);
-      const btn = document.createElement('button');
-      btn.className = `spread-button spread-choice practice-card${def.id === this._activeType ? ' active' : ''}`;
-      btn.disabled = this._loading;
+  namalyuvatySitku(konteyner) {
+    konteyner.innerHTML = ''
+    this._vyznachennya.forEach((def) => {
+      const meta = spreadMeta(def.id)
+      const btn = document.createElement('button')
+      btn.className = `spread-button spread-choice practice-card${def.id === this._aktyvnyyTyp ? ' active' : ''}`
+      btn.disabled = this._zavantazhennya
       btn.innerHTML = `
         <span class="practice-mark" aria-hidden="true">
           <span class="practice-count">${def.count}</span>
@@ -112,13 +106,13 @@ export class RitualSelector extends HTMLElement {
           <em>${meta.pace}</em>
         </span>
         <span class="practice-symbol" aria-hidden="true">${meta.icon}</span>
-      `;
+      `
       btn.addEventListener('click', () => {
-        this.dispatchEvent(new CustomEvent('choose', { detail: def.id }));
-      });
-      container.appendChild(btn);
-    });
+        this.vyslaty('choose', def.id)
+      })
+      konteyner.appendChild(btn)
+    })
   }
 }
 
-customElements.define('ritual-selector', RitualSelector);
+vyznachyty('ritual-selector', RitualSelector)

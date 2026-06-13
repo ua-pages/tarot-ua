@@ -1,116 +1,91 @@
-import { initAnalytics, trackEvent } from '../analytics/analytics.js';
-import { refreshFeatureFlags } from '../analytics/use-features.js';
+import { initAnalytics, trackEvent } from '../analytics/analytics.js'
+import { refreshFeatureFlags } from '../analytics/use-features.js'
+import { Marshrutyzator } from '../lib/karbovanets/gazda/src/index.js'
 
-const template = document.createElement('template');
-template.innerHTML = `<div id="outlet"></div>`;
+import '../components/app-nav.js'
+import '../components/auth-panel.js'
+import '../components/ritual-selector.js'
+import '../components/card-of-day-panel.js'
+import '../components/deck-panel.js'
+import '../components/interpretation-panel.js'
+import '../components/share-panel.js'
+import '../components/spread-board.js'
+import '../components/tarot-journal.js'
+import '../components/stored-spreads-list.js'
+import '../components/tarot-board.js'
+import '../components/fast-session.js'
+import '../components/home-page.js'
+import '../components/journal-page.js'
+import '../components/library-page.js'
+import '../components/seo-card-page.js'
+import '../components/seo-spread-page.js'
 
-import { adoptStyles } from '../shared-styles.js';
+const router = new Marshrutyzator()
 
-export class AppRoot extends HTMLElement {
-  constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
-    this.shadowRoot.appendChild(template.content.cloneNode(true));
-    this._currentPage = null;
-    this._currentRoute = null;
+function vyvestyStorinku(teh, param) {
+  const vyvod = document.getElementById('outlet')
+  vyvod.innerHTML = ''
+  let element
+  switch (teh) {
+    case 'meaning':
+      element = document.createElement('seo-card-page')
+      element.setAttribute('slug', param.slug)
+      break
+    case 'spread':
+      element = document.createElement('seo-spread-page')
+      element.setAttribute('slug', param.slug)
+      break
+    case 'session':
+      element = document.createElement('tarot-board')
+      break
+    case 'fast-session':
+      element = document.createElement('fast-session')
+      break
+    case 'journal':
+      element = document.createElement('journal-page')
+      break
+    case 'library':
+      element = document.createElement('library-page')
+      break
+    default:
+      element = document.createElement('home-page')
   }
-
-  async connectedCallback() {
-    await adoptStyles(this);
-    window.navigateTo = (path) => {
-      window.history.pushState({}, '', path);
-      this.route();
-    };
-
-    window.addEventListener('popstate', () => this.route());
-
-    void initAnalytics();
-    void refreshFeatureFlags();
-    this.addCursorGlow();
-
-    this.route();
-  }
-
-  addCursorGlow() {
-    const glow = document.createElement('div');
-    glow.className = 'mystic-cursor-glow';
-    glow.style.display = 'none';
-    document.body.appendChild(glow);
-
-    let timer;
-    document.addEventListener('mousemove', (e) => {
-      glow.style.display = '';
-      glow.style.left = `${e.clientX}px`;
-      glow.style.top = `${e.clientY}px`;
-      clearTimeout(timer);
-      timer = setTimeout(() => { glow.style.display = 'none'; }, 3000);
-    });
-  }
-
-  route() {
-    const path = window.location.pathname;
-    let route;
-
-    const meaningMatch = path.match(/^\/meaning\/([A-Za-z0-9_-]+)\/?$/);
-    if (meaningMatch?.[1]) {
-      route = { kind: 'meaning', slug: meaningMatch[1] };
-    }
-
-    const spreadMatch = path.match(/^\/spreads\/([A-Za-z0-9_-]+)\/?$/);
-    if (spreadMatch?.[1]) {
-      route = { kind: 'spread', slug: spreadMatch[1] };
-    }
-
-    if (path === '/session' || path === '/session/') route = { kind: 'session', slug: '' };
-    if (path === '/fast-session' || path === '/fast-session/') route = { kind: 'fast-session', slug: '' };
-    if (path === '/journal' || path === '/journal/') route = { kind: 'journal', slug: '' };
-    if (path === '/library' || path === '/library/') route = { kind: 'library', slug: '' };
-    if (path === '/' || path === '') route = { kind: 'home', slug: '' };
-
-    if (path.match(/^\/share\/([A-Za-z0-9_-]+)/)) {
-      route = { kind: 'session', slug: '' };
-    }
-
-    if (!route) route = { kind: 'home', slug: '' };
-
-    if (this._currentRoute?.kind === route.kind && this._currentRoute?.slug === route.slug) return;
-    this._currentRoute = route;
-
-    this.renderPage(route);
-  }
-
-  renderPage(route) {
-    const outlet = this.shadowRoot.getElementById('outlet');
-    outlet.innerHTML = '';
-
-    let element;
-    switch (route.kind) {
-      case 'meaning':
-        element = document.createElement('seo-card-page');
-        element.setAttribute('slug', route.slug);
-        break;
-      case 'spread':
-        element = document.createElement('seo-spread-page');
-        element.setAttribute('slug', route.slug);
-        break;
-      case 'session':
-        element = document.createElement('tarot-board');
-        break;
-      case 'fast-session':
-        element = document.createElement('fast-session');
-        break;
-      case 'journal':
-        element = document.createElement('journal-page');
-        break;
-      case 'library':
-        element = document.createElement('library-page');
-        break;
-      default:
-        element = document.createElement('home-page');
-    }
-
-    outlet.appendChild(element);
-  }
+  vyvod.appendChild(element)
 }
 
-customElements.define('app-root', AppRoot);
+router.na('/', ({ param }) => vyvestyStorinku('home'))
+router.na('/session', ({ param }) => vyvestyStorinku('session'))
+router.na('/fast-session', ({ param }) => vyvestyStorinku('fast-session'))
+router.na('/journal', ({ param }) => vyvestyStorinku('journal'))
+router.na('/library', ({ param }) => vyvestyStorinku('library'))
+router.na('/meaning/:slug', ({ param }) => vyvestyStorinku('meaning', param))
+router.na('/spreads/:slug', ({ param }) => vyvestyStorinku('spread', param))
+router.na('/share/:slug', ({ param }) => vyvestyStorinku('session'))
+
+router.zapas(() => vyvestyStorinku('home'))
+
+window.navigateTo = (shlyakh) => router.yty(shlyakh)
+
+document.addEventListener('DOMContentLoaded', () => {
+  router.pochaty()
+  initAnalytics()
+  refreshFeatureFlags()
+  document.body.appendChild(stvorytySvitinnyaKursora())
+})
+
+function stvorytySvitinnyaKursora() {
+  const svitinnya = document.createElement('div')
+  svitinnya.className = 'mystic-cursor-glow'
+  svitinnya.style.display = 'none'
+
+  let tajmer
+  document.addEventListener('mousemove', (e) => {
+    svitinnya.style.display = ''
+    svitinnya.style.left = `${e.clientX}px`
+    svitinnya.style.top = `${e.clientY}px`
+    clearTimeout(tajmer)
+    tajmer = setTimeout(() => { svitinnya.style.display = 'none' }, 3000)
+  })
+
+  return svitinnya
+}

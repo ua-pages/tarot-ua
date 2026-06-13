@@ -1,553 +1,507 @@
-import { delay, getTodayLabel, cardMeaning } from '../utils.js';
-import { buildSharePreview } from '../share-preview.js';
-import { trackEvent, spreadAnalyticsPayload, interpretationAnalyticsPayload } from '../analytics/analytics.js';
-import { getFlags, onFlagsChange } from '../analytics/use-features.js';
-import { INTERPRETATION_TONES } from '../constants/interpretation.js';
+import { Komponent, vyznachyty } from '../lib/karbovanets/core/src/index.js'
+import { adoptStyles } from '../shared-styles.js'
+import { delay, getTodayLabel, cardMeaning } from '../utils.js'
+import { buildSharePreview } from '../share-preview.js'
+import { trackEvent, spreadAnalyticsPayload, interpretationAnalyticsPayload } from '../analytics/analytics.js'
+import { getFlags, onFlagsChange } from '../analytics/use-features.js'
+import { INTERPRETATION_TONES } from '../constants/interpretation.js'
 import {
   createShareableSpread, drawSpread, fetchCardOfDay,
   fetchCards, fetchSharedSpread,
   fetchSpreadDefinitions, fetchSpreadInterpretation,
-} from '../services/api.js';
-import { loadJournal, addEntry, updateEntry, loadFavorites } from '../services/journal-storage.js';
+} from '../services/api.js'
+import { loadJournal, addEntry, updateEntry, loadFavorites } from '../services/journal-storage.js'
 
-const template = document.createElement('template');
-template.innerHTML = `
-  <main class="page session-page">
-    <div class="ambient-orb orb-one" aria-hidden="true"></div>
-    <div class="ambient-orb orb-two" aria-hidden="true"></div>
-
-    <header class="hero hero-ritual" id="hero-header">
-      <div class="hero-top">
-        <a class="quiet-back-link" href="/" id="back-link">← На головну</a>
-        <p class="eyebrow">Тиха сесія</p>
-      </div>
-      <h1>Почніть з того, що є всередині</h1>
-      <p class="subtitle">Сформулюйте думку, яка зараз не відпускає. Оберіть практику — і дозвольте картам стати приводом для спокійної саморефлексії.</p>
-      <div class="hero-actions">
-        <button class="btn btn-large" type="button" id="scroll-ritual-btn">Зосередитись і обрати практику</button>
-        <span class="hero-hint">пауза · символи · м'яка рефлексія · нотатки</span>
-      </div>
-    </header>
-
-    <auth-panel id="auth-panel"></auth-panel>
-    <ritual-selector id="ritual-selector"></ritual-selector>
-    <card-of-day-panel id="card-of-day"></card-of-day-panel>
-    <spread-board id="spread-board"></spread-board>
-    <share-panel id="share-panel"></share-panel>
-
-    <section id="premium-preview" class="panel premium-preview-panel" style="display:none">
-      <p class="eyebrow">Попередній перегляд преміум</p>
-      <h2>Глибше ШІ-тлумачення</h2>
-      <p class="muted">Тут можна тестувати м'який upsell: розширений аналіз, персональні висновки, додаткові тони і довшу історію.</p>
-      <button class="btn btn-secondary" type="button" id="premium-preview-btn">Подивитись можливості</button>
-    </section>
-
-    <interpretation-panel id="interpretation-panel"></interpretation-panel>
-    <tarot-journal id="favorite-journal" title="Книга розкладів"></tarot-journal>
-    <tarot-journal id="history-journal" title="Історія розкладів"></tarot-journal>
-    <deck-panel id="deck-panel"></deck-panel>
-  </main>
-`;
-
-import { adoptStyles } from '../shared-styles.js';
-
-export class TarotBoard extends HTMLElement {
+export class TarotBoard extends Komponent {
   constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
-    this.shadowRoot.appendChild(template.content.cloneNode(true));
+    super()
+    this.potochnyyKorystuvach = null
+    this.karty = []
+    this.pokazatyKolodu = false
+    this.zavantazhennyaKolody = false
+    this.spread = []
+    this.vyznachennyaRozkladiv = []
+    this.aktyvnyyTyp = 'classic3'
+    this.kartaDnya = null
+    this.zavantazhennya = false
+    this.klyuchVidkryttya = 0
+    this.pomylka = ''
+    this.stanKopii = ''
+    this.tlumachennya = null
+    this.zavantazhennyaTlumachennya = false
+    this.tonTlumachennya = 'psychological'
+    this.selectorZghornuto = false
+    this.pulsDoshky = false
+    this.istoriyaRozkladiv = []
+    this.obraniRozklady = []
+    this.rezultatPoshyrennya = null
+    this.urlPereglyadu = ''
+    this.zavantazhennyaPoshyrennya = false
+    this.peredglyadPoshyrennya = false
 
-    this.currentUser = null;
-    this.cards = [];
-    this.showDeck = false;
-    this.deckLoading = false;
-    this.spread = [];
-    this.spreadDefinitions = [];
-    this.activeSpreadType = 'classic3';
-    this.cardOfDay = null;
-    this.loading = false;
-    this.revealKey = 0;
-    this.error = '';
-    this.copyStatus = '';
-    this.interpretation = null;
-    this.interpretationLoading = false;
-    this.interpretationTone = 'psychological';
-    this.selectorCollapsed = false;
-    this.boardPulse = false;
-    this.spreadHistory = [];
-    this.favoriteSpreads = [];
-    this.shareResult = null;
-    this.sharePreviewUrl = '';
-    this.shareLoading = false;
-    this.isSharedView = false;
-
-    this._flags = getFlags();
-    this.todayLabel = getTodayLabel();
-    this.interpretationTones = INTERPRETATION_TONES;
+    this._prapory = getFlags()
+    this.sogodniPidpys = getTodayLabel()
+    this.tonyTlumachennya = INTERPRETATION_TONES
   }
 
-  async connectedCallback() {
-    await adoptStyles(this);
-    this.bindEvents();
-    onFlagsChange((flags) => {
-      this._flags = flags;
-      this.updatePremiumPreview();
-    });
+  vyvesty() {
+    return `
+      <main class="page session-page">
+        <div class="ambient-orb orb-one" aria-hidden="true"></div>
+        <div class="ambient-orb orb-two" aria-hidden="true"></div>
 
-    trackEvent('app_opened', {});
+        <header class="hero hero-ritual" id="hero-header">
+          <div class="hero-top">
+            <a class="quiet-back-link" href="/" id="back-link">← На головну</a>
+            <p class="eyebrow">Тиха сесія</p>
+          </div>
+          <h1>Почніть з того, що є всередині</h1>
+          <p class="subtitle">Сформулюйте думку, яка зараз не відпускає. Оберіть практику — і дозвольте картам стати приводом для спокійної саморефлексії.</p>
+          <div class="hero-actions">
+            <button class="btn btn-large" type="button" id="scroll-ritual-btn">Зосередитись і обрати практику</button>
+            <span class="hero-hint">пауза · символи · м'яка рефлексія · нотатки</span>
+          </div>
+        </header>
+
+        <auth-panel id="auth-panel"></auth-panel>
+        <ritual-selector id="ritual-selector"></ritual-selector>
+        <card-of-day-panel id="card-of-day"></card-of-day-panel>
+        <spread-board id="spread-board"></spread-board>
+        <share-panel id="share-panel"></share-panel>
+
+        <section id="premium-preview" class="panel premium-preview-panel" style="display:none">
+          <p class="eyebrow">Попередній перегляд преміум</p>
+          <h2>Глибше ШІ-тлумачення</h2>
+          <p class="muted">Тут можна тестувати м'який upsell: розширений аналіз, персональні висновки, додаткові тони і довшу історію.</p>
+          <button class="btn btn-secondary" type="button" id="premium-preview-btn">Подивитись можливості</button>
+        </section>
+
+        <interpretation-panel id="interpretation-panel"></interpretation-panel>
+        <tarot-journal id="favorite-journal" title="Книга розкладів"></tarot-journal>
+        <tarot-journal id="history-journal" title="Історія розкладів"></tarot-journal>
+        <deck-panel id="deck-panel"></deck-panel>
+      </main>
+    `
+  }
+
+  async prykripleno() {
+    await adoptStyles(this)
+    this.pryvYazatyPodiyi()
+    onFlagsChange((prapory) => {
+      this._prapory = prapory
+      this.onovytyPereglyadPrem()
+    })
+
+    trackEvent('app_opened', {})
 
     try {
-      this.loadLocalUser();
-      this.syncLocalLists();
-      await Promise.all([this.loadCardOfDay(), this.loadSpreadDefinitions()]);
+      this.zavantazytyLokalnohoKorystuvacha()
+      this.synkhronizuvatySpysky()
+      await Promise.all([this.zavantazytyKartuDnya(), this.zavantazytyVyznachennyaRozkladiv()])
 
-      const sharedMatch = window.location.pathname.match(/^\/share\/([A-Za-z0-9_-]+)/);
-      if (sharedMatch?.[1]) {
-        await this.loadSharedView(sharedMatch[1]);
+      const spivpadPoshyrennya = window.location.pathname.match(/^\/share\/([A-Za-z0-9_-]+)/)
+      if (spivpadPoshyrennya?.[1]) {
+        await this.zavantazytyPeredglyadPoshyrennya(spivpadPoshyrennya[1])
       } else {
-        await this.refreshSpread('classic3');
-        this.selectorCollapsed = false;
+        await this.onovytyRozklad('classic3')
+        this.selectorZghornuto = false
       }
     } catch (err) {
-      this.error = err instanceof Error ? err.message : 'Сталася помилка';
+      this.pomylka = err instanceof Error ? err.message : 'Сталася помилка'
     }
   }
 
-  loadLocalUser() {
-    const name = localStorage.getItem('tarot-nickname') || '';
-    if (name) {
-      this.currentUser = { name };
-    }
-    this.updateAuthPanel();
+  zavantazytyLokalnohoKorystuvacha() {
+    const imya = localStorage.getItem('tarot-nickname') || ''
+    if (imya) this.potochnyyKorystuvach = { name: imya }
+    this.onovytyPanelKorystuvacha()
   }
 
-  bindEvents() {
-    const root = this.shadowRoot;
-
-    root.getElementById('back-link').addEventListener('click', (e) => {
-      e.preventDefault();
-      window.navigateTo('/');
-    });
-
-    root.getElementById('scroll-ritual-btn').addEventListener('click', () => {
-      trackEvent('ritual_start_clicked');
-      root.getElementById('ritual-selector').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-
-    root.getElementById('premium-preview-btn').addEventListener('click', () => {
+  pryvYazatyPodiyi() {
+    this.znayty('back-link').addEventListener('click', (e) => {
+      e.preventDefault()
+      window.navigateTo('/')
+    })
+    this.znayty('scroll-ritual-btn').addEventListener('click', () => {
+      trackEvent('ritual_start_clicked')
+      this.znayty('ritual-selector').scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+    this.znayty('premium-preview-btn').addEventListener('click', () => {
       trackEvent('premium_preview_clicked', {
-        spreadType: this.activeSpreadType,
+        spreadType: this.aktyvnyyTyp,
         hasSpread: Boolean(this.spread.length)
-      });
-    });
+      })
+    })
 
-    const authPanel = root.getElementById('auth-panel');
-    authPanel.addEventListener('name-changed', (e) => {
-      this.currentUser = e.detail.name ? { name: e.detail.name } : null;
-      this.syncLocalLists();
-    });
-
-    const ritualSelector = root.getElementById('ritual-selector');
-    ritualSelector.addEventListener('choose', (e) => this.chooseSpread(e.detail));
-    ritualSelector.addEventListener('expand', () => { this.selectorCollapsed = false; });
-
-    const spreadBoard = root.getElementById('spread-board');
-    spreadBoard.addEventListener('favorite', () => this.saveFavoriteSpread());
-    spreadBoard.addEventListener('copy', () => this.copySpreadText());
-    spreadBoard.addEventListener('share', () => this.shareCurrentSpread());
-    spreadBoard.addEventListener('image-error', (e) => this.setPlaceholderImage(e.detail));
-
-    const interpPanel = root.getElementById('interpretation-panel');
-    interpPanel.addEventListener('set-tone', (e) => this.setInterpretationTone(e.detail));
-
-    const favoriteJournal = root.getElementById('favorite-journal');
-    favoriteJournal.addEventListener('open', (e) => this.openJournalEntry(e.detail));
-    favoriteJournal.addEventListener('save-note', (e) => this.saveJournalNote(e.detail));
-    favoriteJournal.addEventListener('image-error', (e) => this.setPlaceholderImage(e.detail));
-
-    const historyJournal = root.getElementById('history-journal');
-    historyJournal.addEventListener('open', (e) => this.openJournalEntry(e.detail));
-    historyJournal.addEventListener('save-note', (e) => this.saveJournalNote(e.detail));
-    historyJournal.addEventListener('image-error', (e) => this.setPlaceholderImage(e.detail));
-
-    const deckPanel = root.getElementById('deck-panel');
-    deckPanel.addEventListener('toggle', () => this.toggleDeck());
-    deckPanel.addEventListener('image-error', (e) => this.setPlaceholderImage(e.detail));
-
-    const sharePanel = root.getElementById('share-panel');
-    sharePanel.addEventListener('copy-url', () => this.copyShareUrl());
-    sharePanel.addEventListener('native-share', () => this.nativeShare());
-    sharePanel.addEventListener('select-url', (e) => {
-      e.detail.target.select();
-    });
+    this.znayty('auth-panel').addEventListener('name-changed', (e) => {
+      this.potochnyyKorystuvach = e.detail.name ? { name: e.detail.name } : null
+      this.synkhronizuvatySpysky()
+    })
+    this.znayty('ritual-selector').addEventListener('choose', (e) => this.vybratyRozklad(e.detail))
+    this.znayty('ritual-selector').addEventListener('expand', () => { this.selectorZghornuto = false })
+    this.znayty('spread-board').addEventListener('favorite', () => this.zberegtyObranyyRozklad())
+    this.znayty('spread-board').addEventListener('copy', () => this.kopiyuvatyTekstRozkladu())
+    this.znayty('spread-board').addEventListener('share', () => this.poshyrytyPotochnyyRozklad())
+    this.znayty('spread-board').addEventListener('image-error', (e) => this.vstanovytyZamistneZobrazhennya(e.detail))
+    this.znayty('interpretation-panel').addEventListener('set-tone', (e) => this.vstanovytyTonTlumachennya(e.detail))
+    this.znayty('favorite-journal').addEventListener('open', (e) => this.vidkrytyZapysSchodennyka(e.detail))
+    this.znayty('favorite-journal').addEventListener('save-note', (e) => this.zberegtyNotatkuSchodennyka(e.detail))
+    this.znayty('favorite-journal').addEventListener('image-error', (e) => this.vstanovytyZamistneZobrazhennya(e.detail))
+    this.znayty('history-journal').addEventListener('open', (e) => this.vidkrytyZapysSchodennyka(e.detail))
+    this.znayty('history-journal').addEventListener('save-note', (e) => this.zberegtyNotatkuSchodennyka(e.detail))
+    this.znayty('history-journal').addEventListener('image-error', (e) => this.vstanovytyZamistneZobrazhennya(e.detail))
+    this.znayty('deck-panel').addEventListener('toggle', () => this.peremyknutyKolodu())
+    this.znayty('deck-panel').addEventListener('image-error', (e) => this.vstanovytyZamistneZobrazhennya(e.detail))
+    this.znayty('share-panel').addEventListener('copy-url', () => this.kopiyuvatyURLPoshyrennya())
+    this.znayty('share-panel').addEventListener('native-share', () => this.systemnePoshyrennya())
+    this.znayty('share-panel').addEventListener('select-url', (e) => { e.detail.target.select() })
   }
 
-  updatePremiumPreview() {
-    const el = this.shadowRoot.getElementById('premium-preview');
-    el.style.display = this._flags.premiumPreview ? '' : 'none';
+  onovytyPereglyadPrem() {
+    this.znayty('premium-preview').style.display = this._prapory.premiumPreview ? '' : 'none'
   }
 
-  setHeroV2(enabled) {
-    const hero = this.shadowRoot.getElementById('hero-header');
-    hero.classList.toggle('hero-v2', enabled);
+  onovytyPanelKorystuvacha() {
+    const panel = this.znayty('auth-panel')
+    if (panel.onovlytyUI) panel.onovlytyUI()
   }
 
-  updateAuthPanel() {
-    const panel = this.shadowRoot.getElementById('auth-panel');
-    if (panel.updateUI) panel.updateUI();
+  async vybratyRozklad(typ) {
+    trackEvent('spread_selected', { spreadType: typ })
+    this.selectorZghornuto = true
+    this.onovytyVybirRytualu()
+    await this.onovytyRozklad(typ)
+    this.znayty('spread-board').scrollIntoView({ behavior: 'smooth' })
+    this.pulsDoshky = true
+    setTimeout(() => { this.pulsDoshky = false }, 1100)
   }
 
-  // Session methods
-  async chooseSpread(type) {
-    trackEvent('spread_selected', { spreadType: type });
-    this.selectorCollapsed = true;
-    this.updateRitualSelector();
-    await this.refreshSpread(type);
-    this.shadowRoot.getElementById('spread-board').scrollIntoView({ behavior: 'smooth' });
-    this.boardPulse = true;
-    setTimeout(() => { this.boardPulse = false; }, 1100);
-  }
-
-  async loadCards() {
-    if (this.cards.length || this.deckLoading) return;
-    this.deckLoading = true;
-    try {
-      this.cards = await fetchCards(78);
-    } finally {
-      this.deckLoading = false;
-      this.updateDeckPanel();
+  async zavantazytyKarty() {
+    if (this.karty.length || this.zavantazhennyaKolody) return
+    this.zavantazhennyaKolody = true
+    try { this.karty = await fetchCards(78) }
+    finally {
+      this.zavantazhennyaKolody = false
+      this.onovytyPanelKolody()
     }
   }
 
-  async toggleDeck() {
-    this.showDeck = !this.showDeck;
-    trackEvent('deck_toggled', { expanded: this.showDeck });
-    this.updateDeckPanel();
-    if (this.showDeck) await this.loadCards();
+  async peremyknutyKolodu() {
+    this.pokazatyKolodu = !this.pokazatyKolodu
+    trackEvent('deck_toggled', { expanded: this.pokazatyKolodu })
+    this.onovytyPanelKolody()
+    if (this.pokazatyKolodu) await this.zavantazytyKarty()
   }
 
-  updateDeckPanel() {
-    const panel = this.shadowRoot.getElementById('deck-panel');
-    panel.cards = this.cards;
-    panel.showDeck = this.showDeck;
-    panel.loading = this.deckLoading;
+  onovytyPanelKolody() {
+    const panel = this.znayty('deck-panel')
+    panel.cards = this.karty
+    panel.showDeck = this.pokazatyKolodu
+    panel.loading = this.zavantazhennyaKolody
   }
 
-  async loadSpreadDefinitions() {
-    this.spreadDefinitions = await fetchSpreadDefinitions();
-    this.updateRitualSelector();
+  async zavantazytyVyznachennyaRozkladiv() {
+    this.vyznachennyaRozkladiv = await fetchSpreadDefinitions()
+    this.onovytyVybirRytualu()
   }
 
-  setPlaceholderImage(event) {
-    const image = event.target;
-    if (image.src.endsWith('/cards/tarot-placeholder.svg')) return;
-    image.src = '/cards/tarot-placeholder.svg';
+  vstanovytyZamistneZobrazhennya(event) {
+    const zobrazhennya = event.target
+    if (zobrazhennya.src.endsWith('/cards/tarot-placeholder.svg')) return
+    zobrazhennya.src = '/cards/tarot-placeholder.svg'
   }
 
-  async loadCardOfDay() {
-    this.cardOfDay = await fetchCardOfDay();
+  async zavantazytyKartuDnya() {
+    this.kartaDnya = await fetchCardOfDay()
     trackEvent('daily_card_opened', {
-      cardId: this.cardOfDay.card.id,
-      reversed: this.cardOfDay.reversed
-    });
-    this.updateCardOfDay();
+      cardId: this.kartaDnya.card.id,
+      reversed: this.kartaDnya.reversed
+    })
+    this.onovytyKartuDnya()
   }
 
-  updateCardOfDay() {
-    const panel = this.shadowRoot.getElementById('card-of-day');
-    panel.card = this.cardOfDay;
-    panel.todayLabel = this.todayLabel;
-    panel.error = this.error;
+  onovytyKartuDnya() {
+    const panel = this.znayty('card-of-day')
+    panel.card = this.kartaDnya
+    panel.todayLabel = this.sogodniPidpys
+    panel.error = this.pomylka
   }
 
-  updateRitualSelector() {
-    const selector = this.shadowRoot.getElementById('ritual-selector');
-    selector.definitions = this.spreadDefinitions;
-    selector.activeType = this.activeSpreadType;
-    selector.collapsed = this.selectorCollapsed;
-    selector.loading = this.loading;
+  onovytyVybirRytualu() {
+    const vybir = this.znayty('ritual-selector')
+    vybir.definitions = this.vyznachennyaRozkladiv
+    vybir.activeType = this.aktyvnyyTyp
+    vybir.collapsed = this.selectorZghornuto
+    vybir.loading = this.zavantazhennya
   }
 
-  async refreshSpread(type = this.activeSpreadType) {
-    this.interpretation = null;
-    const definition = this.spreadDefinitions.find((item) => item.id === type);
-    this.activeSpreadType = type;
-    this.loading = true;
-    this.error = '';
-    this.copyStatus = '';
-    this.shareResult = null;
-    this.sharePreviewUrl = '';
+  async onovytyRozklad(typ = this.aktyvnyyTyp) {
+    this.tlumachennya = null
+    const vyznachennya = this.vyznachennyaRozkladiv.find((item) => item.id === typ)
+    this.aktyvnyyTyp = typ
+    this.zavantazhennya = true
+    this.pomylka = ''
+    this.stanKopii = ''
+    this.rezultatPoshyrennya = null
+    this.urlPereglyadu = ''
 
-    this.updateSpreadBoard();
+    this.onovytyDoshkuRozkladu()
 
     try {
-      const [drawnCards] = await Promise.all([
-        drawSpread(definition?.count ?? 3, type),
+      const [karty] = await Promise.all([
+        drawSpread(vyznachennya?.count ?? 3, typ),
         delay(520)
-      ]);
-      this.spread = drawnCards;
-      this.revealKey += this._flags.enhancedReveal ? 1 : 0;
-      trackEvent('reading_generated', spreadAnalyticsPayload(this.spread, this.activeSpreadType));
-      await this.generateInterpretation();
-      await this.saveSpreadToHistory(this.spread, definition?.title ?? `Розклад на ${this.spread.length} карт`);
+      ])
+      this.spread = karty
+      this.klyuchVidkryttya += this._prapory.enhancedReveal ? 1 : 0
+      trackEvent('reading_generated', spreadAnalyticsPayload(this.spread, this.aktyvnyyTyp))
+      await this.heneruvatyTlumachennya()
+      await this.zberegtyRozkladUIstoriyu(this.spread, vyznachennya?.title ?? `Розклад на ${this.spread.length} карт`)
     } catch (err) {
-      this.error = err instanceof Error ? err.message : 'Сталася помилка';
+      this.pomylka = err instanceof Error ? err.message : 'Сталася помилка'
     } finally {
-      this.loading = false;
-      this.updateSpreadBoard();
+      this.zavantazhennya = false
+      this.onovytyDoshkuRozkladu()
     }
   }
 
-  updateSpreadBoard() {
-    const board = this.shadowRoot.getElementById('spread-board');
-    board.spread = this.spread;
-    board.activeDefinition = this.spreadDefinitions.find((d) => d.id === this.activeSpreadType);
-    board.loading = this.loading;
-    board.revealKey = this.revealKey;
-    board.boardPulse = this.boardPulse;
-    board.copyStatus = this.copyStatus;
-    board.shareLoading = this.shareLoading;
-    this.updateRitualSelector();
+  onovytyDoshkuRozkladu() {
+    const doshka = this.znayty('spread-board')
+    doshka.spread = this.spread
+    doshka.activeDefinition = this.vyznachennyaRozkladiv.find((d) => d.id === this.aktyvnyyTyp)
+    doshka.loading = this.zavantazhennya
+    doshka.revealKey = this.klyuchVidkryttya
+    doshka.boardPulse = this.pulsDoshky
+    doshka.copyStatus = this.stanKopii
+    doshka.shareLoading = this.zavantazhennyaPoshyrennya
+    this.onovytyVybirRytualu()
   }
 
-  updateInterpretationPanel() {
-    const panel = this.shadowRoot.getElementById('interpretation-panel');
-    panel.hasSpread = Boolean(this.spread.length);
-    panel.interpretation = this.interpretation;
-    panel.loading = this.interpretationLoading;
-    panel.tone = this.interpretationTone;
-    panel.tones = this.interpretationTones;
+  onovytyPanelTlumachennya() {
+    const panel = this.znayty('interpretation-panel')
+    panel.hasSpread = Boolean(this.spread.length)
+    panel.interpretation = this.tlumachennya
+    panel.loading = this.zavantazhennyaTlumachennya
+    panel.tone = this.tonTlumachennya
+    panel.tones = this.tonyTlumachennya
   }
 
-  async generateInterpretation() {
-    if (!this.spread.length) return;
-
-    this.interpretationLoading = true;
-    this.updateInterpretationPanel();
+  async heneruvatyTlumachennya() {
+    if (!this.spread.length) return
+    this.zavantazhennyaTlumachennya = true
+    this.onovytyPanelTlumachennya()
 
     try {
-      this.interpretation = await fetchSpreadInterpretation(this.spread, this.activeSpreadType, this.interpretationTone);
+      this.tlumachennya = await fetchSpreadInterpretation(this.spread, this.aktyvnyyTyp, this.tonTlumachennya)
       trackEvent('ai_interpretation_generated', interpretationAnalyticsPayload({
         spread: this.spread,
-        spreadType: this.activeSpreadType,
-        tone: this.interpretationTone,
-        source: this.interpretation.provider,
-      }));
+        spreadType: this.aktyvnyyTyp,
+        tone: this.tonTlumachennya,
+        source: this.tlumachennya.provider,
+      }))
     } catch (err) {
-      this.error = err instanceof Error ? err.message : 'Не вдалося згенерувати тлумачення';
+      this.pomylka = err instanceof Error ? err.message : 'Не вдалося згенерувати тлумачення'
     } finally {
-      this.interpretationLoading = false;
-      this.updateInterpretationPanel();
+      this.zavantazhennyaTlumachennya = false
+      this.onovytyPanelTlumachennya()
     }
   }
 
-  async setInterpretationTone(tone) {
-    if (this.interpretationTone === tone) return;
-    this.interpretationTone = tone;
-    trackEvent('interpretation_tone_changed', { tone });
-    await this.generateInterpretation();
+  async vstanovytyTonTlumachennya(ton) {
+    if (this.tonTlumachennya === ton) return
+    this.tonTlumachennya = ton
+    trackEvent('interpretation_tone_changed', { tone: ton })
+    await this.heneruvatyTlumachennya()
   }
 
-  syncLocalLists() {
-    this.spreadHistory = loadJournal();
-    this.favoriteSpreads = loadFavorites();
-    this.updateJournals();
+  synkhronizuvatySpysky() {
+    this.istoriyaRozkladiv = loadJournal()
+    this.obraniRozklady = loadFavorites()
+    this.onovytySchodennyky()
   }
 
-  updateJournals() {
-    this.shadowRoot.getElementById('favorite-journal').items = this.favoriteSpreads;
-    this.shadowRoot.getElementById('history-journal').items = this.spreadHistory;
+  onovytySchodennyky() {
+    this.znayty('favorite-journal').items = this.obraniRozklady
+    this.znayty('history-journal').items = this.istoriyaRozkladiv
   }
 
-  async saveSpreadToHistory(cards, title) {
-    if (!cards.length) return;
-
-    const saved = addEntry({
-      title,
-      spreadType: this.activeSpreadType,
-      cards,
-      interpretation: this.interpretation,
+  async zberegtyRozkladUIstoriyu(karty, tytul) {
+    if (!karty.length) return
+    const zberezhenyy = addEntry({
+      title: tytul,
+      spreadType: this.aktyvnyyTyp,
+      cards: karty,
+      interpretation: this.tlumachennya,
       favorite: false
-    });
-
-    this.spreadHistory.unshift(saved);
-    this.spreadHistory = this.spreadHistory.slice(0, 20);
-    this.updateJournals();
+    })
+    this.istoriyaRozkladiv.unshift(zberezhenyy)
+    this.istoriyaRozkladiv = this.istoriyaRozkladiv.slice(0, 20)
+    this.onovytySchodennyky()
   }
 
-  async saveFavoriteSpread() {
-    if (!this.spread.length) return;
-
+  async zberegtyObranyyRozklad() {
+    if (!this.spread.length) return
     try {
-      const def = this.spreadDefinitions.find((d) => d.id === this.activeSpreadType);
-      const saved = addEntry({
+      const def = this.vyznachennyaRozkladiv.find((d) => d.id === this.aktyvnyyTyp)
+      const zberezhenyy = addEntry({
         title: def?.title ?? 'Обраний розклад',
-        spreadType: this.activeSpreadType,
+        spreadType: this.aktyvnyyTyp,
         cards: this.spread,
-        interpretation: this.interpretation,
+        interpretation: this.tlumachennya,
         favorite: true
-      });
-
-      this.favoriteSpreads.unshift(saved);
-      this.favoriteSpreads = this.favoriteSpreads.slice(0, 12);
-      trackEvent('favorite_added', spreadAnalyticsPayload(this.spread, this.activeSpreadType));
-      this.copyStatus = 'Розклад додано в обране.';
+      })
+      this.obraniRozklady.unshift(zberezhenyy)
+      this.obraniRozklady = this.obraniRozklady.slice(0, 12)
+      trackEvent('favorite_added', spreadAnalyticsPayload(this.spread, this.aktyvnyyTyp))
+      this.stanKopii = 'Розклад додано в обране.'
     } catch (err) {
-      this.copyStatus = err instanceof Error ? err.message : 'Не вдалося додати в обране.';
+      this.stanKopii = err instanceof Error ? err.message : 'Не вдалося додати в обране.'
     }
-    this.updateSpreadBoard();
-    this.updateJournals();
+    this.onovytyDoshkuRozkladu()
+    this.onovytySchodennyky()
   }
 
-  async openJournalEntry(entry) {
-    this.activeSpreadType = entry.spreadType;
-    this.spread = entry.cards;
-    this.interpretation = entry.interpretation;
-    this.selectorCollapsed = true;
-    this.shareResult = null;
-    this.sharePreviewUrl = '';
-    this.copyStatus = 'Розклад відкрито з Книги розкладів.';
+  async vidkrytyZapysSchodennyka(zapis) {
+    this.aktyvnyyTyp = zapis.spreadType
+    this.spread = zapis.cards
+    this.tlumachennya = zapis.interpretation
+    this.selectorZghornuto = true
+    this.rezultatPoshyrennya = null
+    this.urlPereglyadu = ''
+    this.stanKopii = 'Розклад відкрито з Книги розкладів.'
     trackEvent('journal_entry_opened', {
-      id: entry.id,
-      spreadType: entry.spreadType,
-      favorite: entry.favorite,
-      cardsCount: entry.cards.length
-    });
-    this.updateSpreadBoard();
-    this.updateInterpretationPanel();
-    this.updateSharePanel();
-    this.shadowRoot.getElementById('spread-board').scrollIntoView({ behavior: 'smooth' });
+      id: zapis.id,
+      spreadType: zapis.spreadType,
+      favorite: zapis.favorite,
+      cardsCount: zapis.cards.length
+    })
+    this.onovytyDoshkuRozkladu()
+    this.onovytyPanelTlumachennya()
+    this.onovytyPanelPoshyrennya()
+    this.znayty('spread-board').scrollIntoView({ behavior: 'smooth' })
   }
 
-  async saveJournalNote(payload) {
+  async zberegtyNotatkuSchodennyka(payload) {
     try {
-      const updated = updateEntry(payload.id, { note: payload.note });
-      if (updated) {
-        this.spreadHistory = loadJournal();
-        this.favoriteSpreads = loadFavorites();
-        trackEvent('journal_note_saved', { id: payload.id, noteLength: payload.note.length });
-        this.copyStatus = 'Нотатку збережено.';
+      const onovlenyy = updateEntry(payload.id, { note: payload.note })
+      if (onovlenyy) {
+        this.istoriyaRozkladiv = loadJournal()
+        this.obraniRozklady = loadFavorites()
+        trackEvent('journal_note_saved', { id: payload.id, noteLength: payload.note.length })
+        this.stanKopii = 'Нотатку збережено.'
       }
     } catch (err) {
-      this.copyStatus = err instanceof Error ? err.message : 'Не вдалося зберегти нотатку.';
+      this.stanKopii = err instanceof Error ? err.message : 'Не вдалося зберегти нотатку.'
     }
-    this.updateSpreadBoard();
+    this.onovytyDoshkuRozkladu()
   }
 
-  async shareCurrentSpread() {
-    if (!this.spread.length) return;
-
-    trackEvent('share_clicked', spreadAnalyticsPayload(this.spread, this.activeSpreadType));
-
-    this.shareLoading = true;
-    this.copyStatus = '';
+  async poshyrytyPotochnyyRozklad() {
+    if (!this.spread.length) return
+    trackEvent('share_clicked', spreadAnalyticsPayload(this.spread, this.aktyvnyyTyp))
+    this.zavantazhennyaPoshyrennya = true
+    this.stanKopii = ''
 
     try {
-      const def = this.spreadDefinitions.find((d) => d.id === this.activeSpreadType);
-      const title = def?.title ?? 'Мій розклад Таро';
-      const result = await createShareableSpread({
-        title,
-        spreadType: this.activeSpreadType,
+      const def = this.vyznachennyaRozkladiv.find((d) => d.id === this.aktyvnyyTyp)
+      const tytul = def?.title ?? 'Мій розклад Таро'
+      const rezultat = await createShareableSpread({
+        title: tytul,
+        spreadType: this.aktyvnyyTyp,
         cards: this.spread,
-        interpretation: this.interpretation
-      });
-
-      this.shareResult = result;
-      this.sharePreviewUrl = await buildSharePreview(result);
+        interpretation: this.tlumachennya
+      })
+      this.rezultatPoshyrennya = rezultat
+      this.urlPereglyadu = await buildSharePreview(rezultat)
       trackEvent('share_link_created', {
-        slug: result.slug,
-        ...spreadAnalyticsPayload(this.spread, this.activeSpreadType)
-      });
-      this.copyStatus = 'Публічне посилання створено.';
+        slug: rezultat.slug,
+        ...spreadAnalyticsPayload(this.spread, this.aktyvnyyTyp)
+      })
+      this.stanKopii = 'Публічне посилання створено.'
     } catch (err) {
-      this.copyStatus = err instanceof Error ? err.message : 'Не вдалося створити посилання для поширення.';
+      this.stanKopii = err instanceof Error ? err.message : 'Не вдалося створити посилання для поширення.'
     } finally {
-      this.shareLoading = false;
-      this.updateSpreadBoard();
-      this.updateSharePanel();
+      this.zavantazhennyaPoshyrennya = false
+      this.onovytyDoshkuRozkladu()
+      this.onovytyPanelPoshyrennya()
     }
   }
 
-  updateSharePanel() {
-    const panel = this.shadowRoot.getElementById('share-panel');
-    panel.shareResult = this.shareResult;
-    panel.previewUrl = this.sharePreviewUrl;
+  onovytyPanelPoshyrennya() {
+    const panel = this.znayty('share-panel')
+    panel.shareResult = this.rezultatPoshyrennya
+    panel.previewUrl = this.urlPereglyadu
   }
 
-  async copyShareUrl() {
-    if (!this.shareResult) return;
+  async kopiyuvatyURLPoshyrennya() {
+    if (!this.rezultatPoshyrennya) return
     try {
-      await navigator.clipboard.writeText(this.shareResult.url);
-      trackEvent('share_url_copied', { slug: this.shareResult.slug });
-      this.copyStatus = 'Посилання скопійовано.';
+      await navigator.clipboard.writeText(this.rezultatPoshyrennya.url)
+      trackEvent('share_url_copied', { slug: this.rezultatPoshyrennya.slug })
+      this.stanKopii = 'Посилання скопійовано.'
     } catch {
-      this.copyStatus = 'Не вдалося скопіювати посилання автоматично.';
+      this.stanKopii = 'Не вдалося скопіювати посилання автоматично.'
     }
-    this.updateSpreadBoard();
+    this.onovytyDoshkuRozkladu()
   }
 
-  async nativeShare() {
-    if (!this.shareResult) return;
-
+  async systemnePoshyrennya() {
+    if (!this.rezultatPoshyrennya) return
     const payload = {
-      title: this.shareResult.social.title,
-      text: this.shareResult.social.description,
-      url: this.shareResult.url
-    };
-
-    if (navigator.share) {
-      await navigator.share(payload);
-      trackEvent('native_share_completed', { slug: this.shareResult.slug });
-      return;
+      title: this.rezultatPoshyrennya.social.title,
+      text: this.rezultatPoshyrennya.social.description,
+      url: this.rezultatPoshyrennya.url
     }
-
-    await this.copyShareUrl();
+    if (navigator.share) {
+      await navigator.share(payload)
+      trackEvent('native_share_completed', { slug: this.rezultatPoshyrennya.slug })
+      return
+    }
+    await this.kopiyuvatyURLPoshyrennya()
   }
 
-  async loadSharedView(slug) {
-    const shared = await fetchSharedSpread(slug);
-    this.isSharedView = true;
-    this.activeSpreadType = shared.spreadType;
-    this.spread = shared.cards;
-    this.interpretation = shared.interpretation;
-    this.selectorCollapsed = true;
-    this.shareResult = shared;
-    this.sharePreviewUrl = await buildSharePreview(shared);
-    this.copyStatus = 'Відкрито публічний розклад.';
+  async zavantazytyPeredglyadPoshyrennya(slah) {
+    const poshyrenyy = await fetchSharedSpread(slah)
+    this.peredglyadPoshyrennya = true
+    this.aktyvnyyTyp = poshyrenyy.spreadType
+    this.spread = poshyrenyy.cards
+    this.tlumachennya = poshyrenyy.interpretation
+    this.selectorZghornuto = true
+    this.rezultatPoshyrennya = poshyrenyy
+    this.urlPereglyadu = await buildSharePreview(poshyrenyy)
+    this.stanKopii = 'Відкрито публічний розклад.'
     trackEvent('shared_spread_opened', {
-      slug,
-      spreadType: shared.spreadType,
-      cardsCount: shared.cards.length
-    });
-    this.updateSpreadBoard();
-    this.updateInterpretationPanel();
-    this.updateSharePanel();
+      slah,
+      spreadType: poshyrenyy.spreadType,
+      cardsCount: poshyrenyy.cards.length
+    })
+    this.onovytyDoshkuRozkladu()
+    this.onovytyPanelTlumachennya()
+    this.onovytyPanelPoshyrennya()
   }
 
-  async copySpreadText() {
-    if (!this.spread.length) return;
-
-    const def = this.spreadDefinitions.find((d) => d.id === this.activeSpreadType);
-    const title = def?.title ?? 'Розклад Таро';
-    const text = [
-      title,
+  async kopiyuvatyTekstRozkladu() {
+    if (!this.spread.length) return
+    const def = this.vyznachennyaRozkladiv.find((d) => d.id === this.aktyvnyyTyp)
+    const tytul = def?.title ?? 'Розклад Таро'
+    const tekst = [
+      tytul,
       ...this.spread.map((item) => [
         `\n${item.position}: ${item.card.name}${item.reversed ? ' (перевернута)' : ''}`,
         item.positionDescription,
         `Ключові слова: ${item.card.keywords.join(', ')}`,
         `Значення: ${cardMeaning(item)}`
       ].join('\n'))
-    ].join('\n');
-
+    ].join('\n')
     try {
-      await navigator.clipboard.writeText(text);
-      trackEvent('reading_text_copied', spreadAnalyticsPayload(this.spread, this.activeSpreadType));
-      this.copyStatus = 'Текст розкладу скопійовано.';
+      await navigator.clipboard.writeText(tekst)
+      trackEvent('reading_text_copied', spreadAnalyticsPayload(this.spread, this.aktyvnyyTyp))
+      this.stanKopii = 'Текст розкладу скопійовано.'
     } catch {
-      this.copyStatus = 'Не вдалося скопіювати автоматично.';
+      this.stanKopii = 'Не вдалося скопіювати автоматично.'
     }
-    this.updateSpreadBoard();
+    this.onovytyDoshkuRozkladu()
   }
 }
 
-customElements.define('tarot-board', TarotBoard);
+vyznachyty('tarot-board', TarotBoard)

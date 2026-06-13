@@ -1,0 +1,16 @@
+{
+  "name": "karbovanets",
+  "version": "0.1.0",
+  "description": "Reactive web component framework and router",
+  "type": "module",
+  "main": "./core/src/index.js",
+  "exports": {
+    "./core": "./core/src/index.js",
+    "./gazda": "./gazda/src/index.js"
+  },
+  "files": [
+    "core/",
+    "gazda/"
+  ],
+  "license": "MIT"
+}

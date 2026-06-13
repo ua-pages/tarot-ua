@@ -109,7 +109,8 @@ const server = http.createServer((req, res) => {
     return proxyApi(req, res);
   }
 
-  const filePath = path.join(publicDir, url.pathname === '/' ? 'index.html' : url.pathname);
+  const cleanPath = url.pathname === '/' ? 'index.html' : url.pathname.slice(1);
+  const filePath = path.join(publicDir, cleanPath);
   const ext = path.extname(url.pathname);
 
   if (ext && fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
@@ -118,7 +119,7 @@ const server = http.createServer((req, res) => {
   if (isSpaRoute(url.pathname) || url.pathname === '/') {
     return serveIndex(req, res);
   }
-  const altPath = path.join(publicDir, url.pathname, 'index.html');
+  const altPath = path.join(publicDir, url.pathname.slice(1), 'index.html');
   if (fs.existsSync(altPath)) {
     return serveFile(res, altPath);
   }

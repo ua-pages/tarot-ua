@@ -1,164 +1,163 @@
-import { formatDate, groupItemsByMonth, pluralizeCards } from '../utils.js';
-import { TONE_LABELS } from '../constants/interpretation.js';
-import { loadJournal, updateEntry } from '../services/journal-storage.js';
+import { Komponent, vyznachyty } from '../lib/karbovanets/core/src/index.js'
+import { adoptStyles } from '../shared-styles.js'
+import { loadJournal, updateEntry } from '../services/journal-storage.js'
+import { formatDate, groupItemsByMonth, pluralizeCards } from '../utils.js'
+import { TONE_LABELS } from '../constants/interpretation.js'
 
-const template = document.createElement('template');
-template.innerHTML = `
-  <main class="quiet-page">
-    <app-nav></app-nav>
-
-    <section class="quiet-room" aria-labelledby="journal-title">
-      <p class="quiet-kicker">Особистий щоденник</p>
-      <h1 id="journal-title">Історія розкладів</h1>
-      <p class="quiet-lead quiet-lead-narrow">
-        Усі ваші розклади зберігаються локально в браузері.
-      </p>
-    </section>
-
-    <section class="quiet-note-panel">
-      <div id="journal-content"></div>
-      <div id="journal-empty" class="quiet-empty">
-        <p>Ще немає записів. Зробіть розклад у тихій сесії — він з'явиться тут.</p>
-        <div class="quiet-actions">
-          <a class="quiet-btn quiet-btn-primary" href="/session">Перейти до сесії</a>
-          <a class="quiet-btn quiet-btn-ghost" href="/">На головну</a>
-        </div>
-      </div>
-    </section>
-  </main>
-`;
-
-import { adoptStyles } from '../shared-styles.js';
-
-export class JournalPage extends HTMLElement {
+export class JournalPage extends Komponent {
   constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
-    this.shadowRoot.appendChild(template.content.cloneNode(true));
-    this._expandedId = '';
-    this._draftNotes = {};
+    super()
+    this._rozgornutoId = ''
+    this._notatky = {}
   }
 
-  async connectedCallback() {
-    await adoptStyles(this);
-    this.shadowRoot.querySelectorAll('a').forEach((a) => {
+  vyvesty() {
+    return `
+      <main class="quiet-page">
+        <app-nav></app-nav>
+
+        <section class="quiet-room" aria-labelledby="journal-title">
+          <p class="quiet-kicker">Особистий щоденник</p>
+          <h1 id="journal-title">Історія розкладів</h1>
+          <p class="quiet-lead quiet-lead-narrow">
+            Усі ваші розклади зберігаються локально в браузері.
+          </p>
+        </section>
+
+        <section class="quiet-note-panel">
+          <div id="journal-content"></div>
+          <div id="journal-empty" class="quiet-empty">
+            <p>Ще немає записів. Зробіть розклад у тихій сесії — він з'явиться тут.</p>
+            <div class="quiet-actions">
+              <a class="quiet-btn quiet-btn-primary" href="/session">Перейти до сесії</a>
+              <a class="quiet-btn quiet-btn-ghost" href="/">На головну</a>
+            </div>
+          </div>
+        </section>
+      </main>
+    `
+  }
+
+  async prykripleno() {
+    await adoptStyles(this)
+    this.znaytyVsi('a').forEach((a) => {
       a.addEventListener('click', (e) => {
-        e.preventDefault();
-        window.navigateTo(a.getAttribute('href'));
-      });
-    });
-    this.render();
+        e.preventDefault()
+        window.navigateTo(a.getAttribute('href'))
+      })
+    })
+    this.namalyuvaty()
   }
 
-  render() {
-    const items = loadJournal();
-    const content = this.shadowRoot.getElementById('journal-content');
-    const empty = this.shadowRoot.getElementById('journal-empty');
+  namalyuvaty() {
+    const zapysy = loadJournal()
+    const vmist = this.znayty('journal-content')
+    const pusto = this.znayty('journal-empty')
 
-    if (!items.length) {
-      content.innerHTML = '';
-      empty.style.display = '';
-      return;
+    if (!zapysy.length) {
+      vmist.innerHTML = ''
+      pusto.style.display = ''
+      return
     }
 
-    empty.style.display = 'none';
+    pusto.style.display = 'none'
 
-    const groups = groupItemsByMonth(items);
-    content.innerHTML = groups.map((group) => `
+    const grupy = groupItemsByMonth(zapysy)
+    vmist.innerHTML = grupy.map((g) => `
       <section class="journal-month">
-        <h3>${group.month}</h3>
-        ${group.items.map((entry) => this.renderEntry(entry)).join('')}
+        <h3>${g.month}</h3>
+        ${g.items.map((zapis) => this.namalyuvatyZapis(zapis)).join('')}
       </section>
-    `).join('');
+    `).join('')
 
-    content.querySelectorAll('.journal-summary').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        const id = btn.dataset.id;
-        this._expandedId = this._expandedId === id ? '' : id;
-        this.render();
-      });
-    });
-
-    content.querySelectorAll('.journal-note-textarea').forEach((ta) => {
-      ta.addEventListener('input', (e) => {
-        this._draftNotes[ta.dataset.id] = e.target.value;
-      });
-    });
-
-    content.querySelectorAll('.journal-save-note').forEach((btn) => {
+    vmist.querySelectorAll('.journal-summary').forEach((btn) => {
       btn.addEventListener('click', () => {
-        const id = btn.dataset.id;
-        const note = this._draftNotes[id] || '';
-        updateEntry(id, { note });
-        this._draftNotes[id] = note;
-        btn.textContent = 'Нотатку збережено';
-        setTimeout(() => { btn.textContent = 'Зберегти нотатку'; }, 2000);
-      });
-    });
+        const id = btn.dataset.id
+        this._rozgornutoId = this._rozgornutoId === id ? '' : id
+        this.namalyuvaty()
+      })
+    })
+
+    vmist.querySelectorAll('.journal-note-textarea').forEach((ta) => {
+      ta.addEventListener('input', (e) => {
+        this._notatky[ta.dataset.id] = e.target.value
+      })
+    })
+
+    vmist.querySelectorAll('.journal-save-note').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id
+        const notatka = this._notatky[id] || ''
+        updateEntry(id, { note: notatka })
+        this._notatky[id] = notatka
+        btn.textContent = 'Нотатку збережено'
+        setTimeout(() => { btn.textContent = 'Зберегти нотатку' }, 2000)
+      })
+    })
   }
 
-  renderEntry(entry) {
-    const isExpanded = this._expandedId === entry.id;
-    const toneLabel = entry.interpretation?.tone && TONE_LABELS[entry.interpretation.tone]
-      ? TONE_LABELS[entry.interpretation.tone]
-      : 'Без тону';
+  namalyuvatyZapis(zapis) {
+    const rozgornuto = this._rozgornutoId === zapis.id
+    const tonLabel = zapis.interpretation?.tone && TONE_LABELS[zapis.interpretation.tone]
+      ? TONE_LABELS[zapis.interpretation.tone]
+      : 'Без тону'
 
-    const cardsHtml = entry.cards.map((drawn) => `
+    const kartyHtml = zapis.cards.map((karta) => `
       <article class="journal-drawn-card">
-        <img src="${drawn.card.image}" alt="${drawn.card.name}" class="${drawn.reversed ? 'is-reversed' : ''}" loading="lazy" decoding="async"
+        <img src="${karta.card.image}" alt="${karta.card.name}" class="${karta.reversed ? 'is-reversed' : ''}" loading="lazy" decoding="async"
           onerror="this.src='/cards/tarot-placeholder.svg'">
         <div>
-          <span class="journal-position">${drawn.position}</span>
-          <strong>${drawn.card.name}</strong>
-          ${drawn.reversed ? '<small>Перевернута</small>' : ''}
-          <p>${drawn.positionDescription}</p>
+          <span class="journal-position">${karta.position}</span>
+          <strong>${karta.card.name}</strong>
+          ${karta.reversed ? '<small>Перевернута</small>' : ''}
+          <p>${karta.positionDescription}</p>
         </div>
       </article>
-    `).join('');
+    `).join('')
 
-    const interpHtml = entry.interpretation ? `
+    const interpHtml = zapis.interpretation ? `
       <div class="journal-interpretation">
         <div class="journal-meta-row">
-          <span>${entry.interpretation.provider === 'llm' ? 'ШІ' : 'Запасний варіант'}</span>
-          <span>${toneLabel}</span>
+          <span>${zapis.interpretation.provider === 'llm' ? 'ШІ' : 'Запасний варіант'}</span>
+          <span>${tonLabel}</span>
         </div>
-        <h4>${entry.interpretation.title}</h4>
-        <p>${entry.interpretation.summary}</p>
-        <p><strong>Енергія:</strong> ${entry.interpretation.energy}</p>
-        <p><strong>Тінь:</strong> ${entry.interpretation.shadow}</p>
-        <p><strong>Наступний крок:</strong> ${entry.interpretation.nextStep}</p>
+        <h4>${zapis.interpretation.title}</h4>
+        <p>${zapis.interpretation.summary}</p>
+        <p><strong>Енергія:</strong> ${zapis.interpretation.energy}</p>
+        <p><strong>Тінь:</strong> ${zapis.interpretation.shadow}</p>
+        <p><strong>Наступний крок:</strong> ${zapis.interpretation.nextStep}</p>
       </div>
-    ` : '';
+    ` : ''
 
-    const note = this._draftNotes[entry.id] ?? entry.note ?? '';
+    const notatka = this._notatky[zapis.id] ?? zapis.note ?? ''
 
     return `
-      <article class="journal-card${isExpanded ? ' expanded' : ''}">
-        <button class="journal-summary" type="button" data-id="${entry.id}">
-          <span class="journal-icon">${entry.favorite ? '★' : '✦'}</span>
+      <article class="journal-card${rozgornuto ? ' expanded' : ''}">
+        <button class="journal-summary" type="button" data-id="${zapis.id}">
+          <span class="journal-icon">${zapis.favorite ? '★' : '✦'}</span>
           <span class="journal-main">
-            <strong>${entry.title}</strong>
-            <small>${formatDate(entry.createdAt)} · ${entry.cards.length} ${pluralizeCards(entry.cards.length)} · ${toneLabel}</small>
+            <strong>${zapis.title}</strong>
+            <small>${formatDate(zapis.createdAt)} · ${zapis.cards.length} ${pluralizeCards(zapis.cards.length)} · ${tonLabel}</small>
           </span>
-          <span class="journal-chevron">${isExpanded ? '−' : '+'}</span>
+          <span class="journal-chevron">${rozgornuto ? '−' : '+'}</span>
         </button>
-        ${isExpanded ? `
+        ${rozgornuto ? `
           <div class="journal-details">
-            <div class="journal-card-grid">${cardsHtml}</div>
+            <div class="journal-card-grid">${kartyHtml}</div>
             ${interpHtml}
             <label class="journal-note">
               <span>Особиста нотатка</span>
-              <textarea class="journal-note-textarea" data-id="${entry.id}" placeholder="Що відчувається після цього розкладу? Що справдилось пізніше?" rows="4">${note}</textarea>
+              <textarea class="journal-note-textarea" data-id="${zapis.id}" placeholder="Що відчувається після цього розкладу? Що справдилось пізніше?" rows="4">${notatka}</textarea>
             </label>
             <div class="journal-actions">
               <button class="btn btn-secondary" type="button" onclick="window.navigateTo('/session')">Відкрити розклад</button>
-              <button class="btn btn-ghost journal-save-note" data-id="${entry.id}">Зберегти нотатку</button>
+              <button class="btn btn-ghost journal-save-note" data-id="${zapis.id}">Зберегти нотатку</button>
             </div>
           </div>
         ` : ''}
       </article>
-    `;
+    `
   }
 }
 
-customElements.define('journal-page', JournalPage);
+vyznachyty('journal-page', JournalPage)

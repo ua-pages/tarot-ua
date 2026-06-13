@@ -1,62 +1,62 @@
-const template = document.createElement('template');
-template.innerHTML = `
-  <section class="panel" style="display:none">
-    <h2 id="list-title"></h2>
-    <div id="history-list" class="history-list"></div>
-  </section>
-`;
+import { Komponent, vyznachyty } from '../lib/karbovanets/core/src/index.js'
+import { adoptStyles } from '../shared-styles.js'
 
-import { adoptStyles } from '../shared-styles.js';
-
-export class StoredSpreadsList extends HTMLElement {
+export class StoredSpreadsList extends Komponent {
   constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
-    this.shadowRoot.appendChild(template.content.cloneNode(true));
+    super()
+    this._zapysy = []
   }
 
-  async connectedCallback() {
-    await adoptStyles(this);
-    this.render();
+  vyvesty() {
+    return `
+      <section class="panel" style="display:none">
+        <h2 id="list-title"></h2>
+        <div id="history-list" class="history-list"></div>
+      </section>
+    `
   }
 
-  static get observedAttributes() { return ['title', 'items']; }
+  async prykripleno() {
+    await adoptStyles(this)
+    this.namalyuvaty()
+  }
 
-  attributeChangedCallback() { this.render(); }
+  static get observedAttributes() { return ['title', 'items'] }
+  attributeChangedCallback() { this.namalyuvaty() }
 
-  set title(val) { this.setAttribute('title', val); }
-  set items(val) { this._items = val; this.render(); }
+  set title(val) { this.setAttribute('title', val) }
+  set items(val) { this._zapysy = val; this.namalyuvaty() }
 
-  render() {
-    const items = this._items || [];
-    const section = this.shadowRoot.querySelector('section');
-    const title = this.shadowRoot.getElementById('list-title');
-    const list = this.shadowRoot.getElementById('history-list');
+  namalyuvaty() {
+    const zapysy = this._zapysy || []
+    const sektsiya = this.znayty('section')
+    const tytul = this.znayty('list-title')
+    const spysok = this.znayty('history-list')
 
-    title.textContent = this.getAttribute('title') || '';
+    tytul.textContent = this.getAttribute('title') || ''
 
-    if (!items.length) {
-      section.style.display = 'none';
-      return;
+    if (!zapysy.length) {
+      sektsiya.style.display = 'none'
+      return
     }
 
-    section.style.display = '';
-    list.innerHTML = '';
-    items.forEach((entry) => {
-      const article = document.createElement('article');
-      article.className = 'history-item';
-      article.innerHTML = `
+    sektsiya.style.display = ''
+    spysok.innerHTML = ''
+    zapysy.forEach((zapis) => {
+      const stattya = document.createElement('article')
+      stattya.className = 'history-item'
+      stattya.innerHTML = `
         <div class="history-head">
-          <strong>${entry.title}</strong>
-          <span>${entry.date}</span>
+          <strong>${zapis.title}</strong>
+          <span>${zapis.date}</span>
         </div>
         <div class="history-cards">
-          ${entry.cards.map((c) => `<span>${c}</span>`).join('')}
+          ${zapis.cards.map((c) => `<span>${c}</span>`).join('')}
         </div>
-      `;
-      list.appendChild(article);
-    });
+      `
+      spysok.appendChild(stattya)
+    })
   }
 }
 
-customElements.define('stored-spreads-list', StoredSpreadsList);
+vyznachyty('stored-spreads-list', StoredSpreadsList)
