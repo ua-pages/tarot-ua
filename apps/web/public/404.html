@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <script>
-      // GitHub Pages SPA redirect
-      const path = location.pathname.slice(1);
-      location.replace('/?p=' + encodeURIComponent(path) + location.search.slice(1) + location.hash);
+      const base = '/tarot-ua';
+      const path = location.pathname.slice(base.length) || '/';
+      location.replace(base + '/?p=' + encodeURIComponent(path) + location.hash);
     </script>
   </head>
 </html>

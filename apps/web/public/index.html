@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#100b1f" />
-    <link rel="canonical" href="/" />
+    <base href="/tarot-ua/" />
+    <link rel="canonical" href="/tarot-ua/" />
     <title>Таро Черіот — онлайн-розклади Таро</title>
     <meta name="description" content="Онлайн-розклади Таро українською: значення карт, перевернуті положення, ШІ-тлумачення та публічні посилання для поширення." />
     <meta property="og:title" content="Таро Черіот — онлайн-розклади Таро" />
@@ -19,7 +20,7 @@
       (function () {
         const q = new URLSearchParams(location.search);
         const p = q.get('p');
-        if (p) history.replaceState(null, '', '/' + decodeURIComponent(p));
+        if (p) history.replaceState(null, '', '/tarot-ua/' + decodeURIComponent(p).replace(/^\//, ''));
       })();
     </script>
     <link rel="stylesheet" href="/css/styles.css" />

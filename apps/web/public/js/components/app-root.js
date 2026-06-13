@@ -48,7 +48,8 @@ export class AppRoot extends HTMLElement {
   }
 
   route() {
-    const path = window.location.pathname;
+    const base = '/tarot-ua';
+    const path = window.location.pathname.replace(base, '') || '/';
     let route;
 
     const meaningMatch = path.match(/^\/meaning\/([A-Za-z0-9_-]+)\/?$/);
