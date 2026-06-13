@@ -1,180 +1,188 @@
-import { Komponent, vyznachyty } from '../lib/karbovanets/core/src/index.js'
-import { adoptStyles } from '../shared-styles.js'
-import { formatDate, groupItemsByMonth, pluralizeCards } from '../utils.js'
-import { TONE_LABELS } from '../constants/interpretation.js'
+import { formatuvatyData, hrupaElementyPoMisats, mnozhynatyKarta } from '../utils.js';
+import { TONE_LABELS } from '../constants/interpretation.js';
 
-export class TarotJournal extends Komponent {
+const template = document.createElement('template');
+template.innerHTML = `
+  <section class="panel journal-panel" style="display:none">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Щоденник Таро</p>
+        <h2 id="journal-title"></h2>
+        <p class="muted">Збережені розклади як особистий архів: карти, позиції, ШІ-тлумачення і твої нотатки.</p>
+      </div>
+      <span id="journal-count" class="journal-count"></span>
+    </div>
+    <div id="journal-timeline" class="journal-timeline"></div>
+  </section>
+`;
+
+import { pereinjatyStyl } from '../shared-styles.js';
+
+export class TarotJournal extends HTMLElement {
   constructor() {
-    super()
-    this._zapysy = []
-    this._rozgornutoId = ''
-    this._notatky = {}
+    super();
+    this.attachShadow({ mode: 'open' });
+    this.shadowRoot.appendChild(template.content.cloneNode(true));
+    this._items = [];
+    this._expandedId = '';
+    this._draftNotes = {};
   }
 
-  vyvesty() {
-    return `
-      <section id="journal-panel" class="panel journal-panel" style="display:none">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">Щоденник Таро</p>
-            <h2 id="journal-title"></h2>
-            <p class="muted">Збережені розклади як особистий архів: карти, позиції, ШІ-тлумачення і твої нотатки.</p>
-          </div>
-          <span id="journal-count" class="journal-count"></span>
-        </div>
-        <div id="journal-timeline" class="journal-timeline"></div>
-      </section>
-    `
+  async connectedCallback() {
+    await pereinjatyStyl(this);
+    this.render();
   }
 
-  async prykripleno() {
-    await adoptStyles(this)
-    this.namalyuvaty()
-  }
+  set title(val) { this.setAttribute('title', val); }
+  set items(val) { this._items = val; this.render(); }
 
-  set title(val) { this.setAttribute('title', val) }
-  set items(val) { this._zapysy = val; this.namalyuvaty() }
-  get title() { return this.getAttribute('title') || '' }
+  get title() { return this.getAttribute('title') || ''; }
 
-  namalyuvaty() {
-    const sektsiya = this.znayty('journal-panel')
-    const zapysy = this._zapysy
+  render() {
+    const section = this.shadowRoot.querySelector('section');
+    const items = this._items;
 
-    if (!zapysy.length) {
-      sektsiya.style.display = 'none'
-      return
+    if (!items.length) {
+      section.style.display = 'none';
+      return;
     }
 
-    sektsiya.style.display = ''
-    this.znayty('journal-title').textContent = this.title
-    this.znayty('journal-count').textContent = `${zapysy.length} ${zapysy.length === 1 ? 'запис' : 'записів'}`
+    section.style.display = '';
+    this.shadowRoot.getElementById('journal-title').textContent = this.title;
+    this.shadowRoot.getElementById('journal-count').textContent = `${items.length} ${items.length === 1 ? 'запис' : 'записів'}`;
 
-    const chasovaLiniya = this.znayty('journal-timeline')
-    chasovaLiniya.innerHTML = ''
+    const timeline = this.shadowRoot.getElementById('journal-timeline');
+    timeline.innerHTML = '';
 
-    const grupy = groupItemsByMonth(zapysy)
-    grupy.forEach((grupa) => {
-      const misSektsiya = document.createElement('section')
-      misSektsiya.className = 'journal-month'
-      const h3 = document.createElement('h3')
-      h3.textContent = grupa.month
-      misSektsiya.appendChild(h3)
+    const groups = hrupaElementyPoMisats(items);
+    groups.forEach((group) => {
+      const monthSection = document.createElement('section');
+      monthSection.className = 'journal-month';
+      const h3 = document.createElement('h3');
+      h3.textContent = group.month;
+      monthSection.appendChild(h3);
 
-      grupa.items.forEach((zapis) => {
-        misSektsiya.appendChild(this.stvorytyKartkuZapysu(zapis))
-      })
+      group.items.forEach((entry) => {
+        monthSection.appendChild(this.createEntryCard(entry));
+      });
 
-      chasovaLiniya.appendChild(misSektsiya)
-    })
+      timeline.appendChild(monthSection);
+    });
   }
 
-  stvorytyKartkuZapysu(zapis) {
-    const stattya = document.createElement('article')
-    stattya.className = `journal-card${this._rozgornutoId === zapis.id ? ' expanded' : ''}`
+  createEntryCard(entry) {
+    const article = document.createElement('article');
+    article.className = `journal-card${this._expandedId === entry.id ? ' expanded' : ''}`;
 
-    const sumary = document.createElement('button')
-    sumary.className = 'journal-summary'
-    sumary.type = 'button'
-    sumary.innerHTML = `
+    const summary = document.createElement('button');
+    summary.className = 'journal-summary';
+    summary.type = 'button';
+    summary.innerHTML = `
       <span class="journal-icon">✦</span>
       <span class="journal-main">
-        <strong>${zapis.title}</strong>
-        <small>${formatDate(zapis.createdAt)} · ${zapis.cards.length} ${pluralizeCards(zapis.cards.length)} · ${this.znachokTonu(zapis.interpretation?.tone)}</small>
+        <strong>${entry.title}</strong>
+        <small>${formatuvatyData(entry.createdAt)} · ${entry.cards.length} ${mnozhynatyKarta(entry.cards.length)} · ${this.toneLabel(entry.interpretation?.tone)}</small>
       </span>
-      <span class="journal-chevron">${this._rozgornutoId === zapis.id ? '−' : '+'}</span>
-    `
-    sumary.addEventListener('click', () => {
-      this._rozgornutoId = this._rozgornutoId === zapis.id ? '' : zapis.id
-      this.namalyuvaty()
-    })
-    stattya.appendChild(sumary)
+      <span class="journal-chevron">${this._expandedId === entry.id ? '−' : '+'}</span>
+    `;
+    summary.addEventListener('click', () => {
+      this._expandedId = this._expandedId === entry.id ? '' : entry.id;
+      this.render();
+    });
+    article.appendChild(summary);
 
-    if (this._rozgornutoId === zapis.id) {
-      const detal = document.createElement('div')
-      detal.className = 'journal-details'
+    if (this._expandedId === entry.id) {
+      const details = document.createElement('div');
+      details.className = 'journal-details';
 
-      const sitkaKart = document.createElement('div')
-      sitkaKart.className = 'journal-card-grid'
-      zapis.cards.forEach((karta) => {
-        const kartaStatt = document.createElement('article')
-        kartaStatt.className = 'journal-drawn-card'
-        const img = document.createElement('img')
-        img.src = karta.card.image
-        img.alt = karta.card.name
-        img.className = karta.reversed ? 'is-reversed' : ''
-        img.loading = 'lazy'
-        img.decoding = 'async'
-        img.addEventListener('error', (e) => this.vyslaty('image-error', e))
-        const div = document.createElement('div')
+      const cardGrid = document.createElement('div');
+      cardGrid.className = 'journal-card-grid';
+      entry.cards.forEach((drawn) => {
+        const cardArticle = document.createElement('article');
+        cardArticle.className = 'journal-drawn-card';
+        const img = document.createElement('img');
+        img.src = drawn.card.image;
+        img.alt = drawn.card.name;
+        img.className = drawn.reversed ? 'is-reversed' : '';
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        img.addEventListener('error', (e) => {
+          this.dispatchEvent(new CustomEvent('image-error', { detail: e }));
+        });
+        const div = document.createElement('div');
         div.innerHTML = `
-          <span class="journal-position">${karta.position}</span>
-          <strong>${karta.card.name}</strong>
-          ${karta.reversed ? '<small>Перевернута</small>' : ''}
-          <p>${karta.positionDescription}</p>
-        `
-        kartaStatt.appendChild(img)
-        kartaStatt.appendChild(div)
-        sitkaKart.appendChild(kartaStatt)
-      })
-      detal.appendChild(sitkaKart)
+          <span class="journal-position">${drawn.position}</span>
+          <strong>${drawn.card.name}</strong>
+          ${drawn.reversed ? '<small>Перевернута</small>' : ''}
+          <p>${drawn.positionDescription}</p>
+        `;
+        cardArticle.appendChild(img);
+        cardArticle.appendChild(div);
+        cardGrid.appendChild(cardArticle);
+      });
+      details.appendChild(cardGrid);
 
-      if (zapis.interpretation) {
-        const interpDiv = document.createElement('div')
-        interpDiv.className = 'journal-interpretation'
+      if (entry.interpretation) {
+        const interpDiv = document.createElement('div');
+        interpDiv.className = 'journal-interpretation';
         interpDiv.innerHTML = `
           <div class="journal-meta-row">
-            <span>${zapis.interpretation.provider === 'llm' ? 'ШІ' : 'Запасний варіант'}</span>
-            <span>${this.znachokTonu(zapis.interpretation.tone)}</span>
+            <span>${entry.interpretation.provider === 'llm' ? 'ШІ' : 'Запасний варіант'}</span>
+            <span>${this.toneLabel(entry.interpretation.tone)}</span>
           </div>
-          <h4>${zapis.interpretation.title}</h4>
-          <p>${zapis.interpretation.summary}</p>
-          <p><strong>Енергія:</strong> ${zapis.interpretation.energy}</p>
-          <p><strong>Тінь:</strong> ${zapis.interpretation.shadow}</p>
-          <p><strong>Наступний крок:</strong> ${zapis.interpretation.nextStep}</p>
-        `
-        detal.appendChild(interpDiv)
+          <h4>${entry.interpretation.title}</h4>
+          <p>${entry.interpretation.summary}</p>
+          <p><strong>Енергія:</strong> ${entry.interpretation.energy}</p>
+          <p><strong>Тінь:</strong> ${entry.interpretation.shadow}</p>
+          <p><strong>Наступний крок:</strong> ${entry.interpretation.nextStep}</p>
+        `;
+        details.appendChild(interpDiv);
       }
 
-      const label = document.createElement('label')
-      label.className = 'journal-note'
-      label.innerHTML = '<span>Особиста нотатка</span>'
-      const textarea = document.createElement('textarea')
-      textarea.value = this._notatky[zapis.id] ?? zapis.note ?? ''
-      textarea.placeholder = 'Що відчувається після цього розкладу? Що справдилось пізніше?'
-      textarea.rows = 4
+      const label = document.createElement('label');
+      label.className = 'journal-note';
+      label.innerHTML = '<span>Особиста нотатка</span>';
+      const textarea = document.createElement('textarea');
+      textarea.value = this._draftNotes[entry.id] ?? entry.note ?? '';
+      textarea.placeholder = 'Що відчувається після цього розкладу? Що справдилось пізніше?';
+      textarea.rows = 4;
       textarea.addEventListener('input', (e) => {
-        this._notatky[zapis.id] = e.target.value
-      })
-      label.appendChild(textarea)
+        this._draftNotes[entry.id] = e.target.value;
+      });
+      label.appendChild(textarea);
 
-      const diyi = document.createElement('div')
-      diyi.className = 'journal-actions'
-      const vidkrytyBtn = document.createElement('button')
-      vidkrytyBtn.className = 'btn btn-secondary'
-      vidkrytyBtn.type = 'button'
-      vidkrytyBtn.textContent = 'Відкрити розклад'
-      vidkrytyBtn.addEventListener('click', () => this.vyslaty('open', zapis))
-      const zberegtyBtn = document.createElement('button')
-      zberegtyBtn.className = 'btn btn-ghost'
-      zberegtyBtn.type = 'button'
-      zberegtyBtn.textContent = 'Зберегти нотатку'
-      zberegtyBtn.addEventListener('click', () => {
-        this.vyslaty('save-note', { id: zapis.id, note: this._notatky[zapis.id] ?? zapis.note ?? '' })
-      })
-      diyi.appendChild(vidkrytyBtn)
-      diyi.appendChild(zberegtyBtn)
+      const actions = document.createElement('div');
+      actions.className = 'journal-actions';
+      const openBtn = document.createElement('button');
+      openBtn.className = 'btn btn-secondary';
+      openBtn.type = 'button';
+      openBtn.textContent = 'Відкрити розклад';
+      openBtn.addEventListener('click', () => {
+        this.dispatchEvent(new CustomEvent('open', { detail: entry }));
+      });
+      const saveBtn = document.createElement('button');
+      saveBtn.className = 'btn btn-ghost';
+      saveBtn.type = 'button';
+      saveBtn.textContent = 'Зберегти нотатку';
+      saveBtn.addEventListener('click', () => {
+        this.dispatchEvent(new CustomEvent('save-note', {
+          detail: { id: entry.id, note: this._draftNotes[entry.id] ?? entry.note ?? '' }
+        }));
+      });
+      actions.appendChild(openBtn);
+      actions.appendChild(saveBtn);
 
-      detal.appendChild(label)
-      detal.appendChild(diyi)
-      stattya.appendChild(detal)
+      details.appendChild(label);
+      details.appendChild(actions);
+      article.appendChild(details);
     }
 
-    return stattya
+    return article;
   }
 
-  znachokTonu(ton) {
-    return ton && ton in TONE_LABELS ? TONE_LABELS[ton] : 'Без тону'
+  toneLabel(tone) {
+    return tone && tone in TONE_LABELS ? TONE_LABELS[tone] : 'Без тону';
   }
 }
 
-vyznachyty('tarot-journal', TarotJournal)
+customElements.define('tarot-journal', TarotJournal);

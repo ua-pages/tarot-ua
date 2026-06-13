@@ -1,13 +1,13 @@
-function upsertMeta(selector, create, valueSetter) {
+function onovytyMeta(selector, stvoryty, valueSetter) {
   let element = document.head.querySelector(selector);
   if (!element) {
-    element = create();
+    element = stvoryty();
     document.head.appendChild(element);
   }
   valueSetter(element);
 }
 
-function absoluteUrl(pathOrUrl) {
+function absoliutnyiUrl(pathOrUrl) {
   if (/^https?:\/\//.test(pathOrUrl)) return pathOrUrl;
   return `${window.location.origin}${pathOrUrl.startsWith('/') ? pathOrUrl : `/${pathOrUrl}`}`;
 }
@@ -15,18 +15,18 @@ function absoluteUrl(pathOrUrl) {
 export function setSeoMeta(input) {
   const title = input.title.trim();
   const description = input.description.trim();
-  const canonicalUrl = absoluteUrl(input.canonicalPath || window.location.pathname);
-  const image = absoluteUrl(input.image || '/seo/og-default.svg');
+  const canonicalUrl = absoliutnyiUrl(input.canonicalPath || window.location.pathname);
+  const image = absoliutnyiUrl(input.image || '/seo/og-default.svg');
 
   document.title = title;
 
-  upsertMeta('meta[name="description"]', () => {
+  onovytyMeta('meta[name="description"]', () => {
     const meta = document.createElement('meta');
     meta.setAttribute('name', 'description');
     return meta;
   }, (meta) => meta.setAttribute('content', description));
 
-  upsertMeta('link[rel="canonical"]', () => {
+  onovytyMeta('link[rel="canonical"]', () => {
     const link = document.createElement('link');
     link.setAttribute('rel', 'canonical');
     return link;
@@ -46,7 +46,7 @@ export function setSeoMeta(input) {
 
   Object.entries(og).forEach(([property, content]) => {
     const selector = property.startsWith('twitter:') ? `meta[name="${property}"]` : `meta[property="${property}"]`;
-    upsertMeta(selector, () => {
+    onovytyMeta(selector, () => {
       const meta = document.createElement('meta');
       if (property.startsWith('twitter:')) meta.setAttribute('name', property);
       else meta.setAttribute('property', property);

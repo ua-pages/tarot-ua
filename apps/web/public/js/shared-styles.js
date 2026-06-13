@@ -1,7 +1,7 @@
 let sharedSheet = null;
 let sheetPromise = null;
 
-function getSharedSheet() {
+function otymatySpilnyiArkush() {
   if (sharedSheet) return sharedSheet;
   if (!sheetPromise) {
     sheetPromise = fetch('/css/styles.css')
@@ -17,8 +17,8 @@ function getSharedSheet() {
   return sheetPromise;
 }
 
-export async function adoptStyles(element) {
-  const sheet = await getSharedSheet();
+export async function pereinjatyStyl(element) {
+  const sheet = await otymatySpilnyiArkush();
   if (sheet) {
     element.shadowRoot.adoptedStyleSheets = [sheet];
   }

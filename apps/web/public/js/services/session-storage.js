@@ -1,12 +1,12 @@
 const PREFIX = 'tarot-fast:';
 
-export function saveSession(key, data) {
+export function zberehtySesiia(key, data) {
   try {
     sessionStorage.setItem(PREFIX + key, JSON.stringify(data));
   } catch {}
 }
 
-export function loadSession(key) {
+export function zavantazhytySesiia(key) {
   try {
     const raw = sessionStorage.getItem(PREFIX + key);
     return raw ? JSON.parse(raw) : null;
@@ -15,13 +15,13 @@ export function loadSession(key) {
   }
 }
 
-export function removeSession(key) {
+export function vydalytySesiia(key) {
   try {
     sessionStorage.removeItem(PREFIX + key);
   } catch {}
 }
 
-export function clearSession() {
+export function ochystytySesiia() {
   try {
     Object.keys(sessionStorage)
       .filter((k) => k.startsWith(PREFIX))
@@ -29,26 +29,26 @@ export function clearSession() {
   } catch {}
 }
 
-export function saveSpreadSession(data) {
-  saveSession('spread', data);
+export function zberehtyRozkładSesiia(data) {
+  zberehtySesiia('spread', data);
 }
 
-export function loadSpreadSession() {
-  return loadSession('spread');
+export function zavantazhytyRozkładSesiia() {
+  return zavantazhytySesiia('spread');
 }
 
-export function saveInterpretationSession(data) {
-  saveSession('interpretation', data);
+export function zberehtyInterpretatsiiaSesiia(data) {
+  zberehtySesiia('interpretation', data);
 }
 
-export function loadInterpretationSession() {
-  return loadSession('interpretation');
+export function zavantazhytyInterpretatsiiaSesiia() {
+  return zavantazhytySesiia('interpretation');
 }
 
-export function saveNickname(name) {
-  saveSession('nickname', name);
+export function zberehtyNikneym(name) {
+  zberehtySesiia('nickname', name);
 }
 
-export function loadNickname() {
-  return loadSession('nickname');
+export function zavantazhytyNikneym() {
+  return zavantazhytySesiia('nickname');
 }

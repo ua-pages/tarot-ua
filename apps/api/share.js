@@ -1,8 +1,8 @@
 const { randomBytes } = require('node:crypto');
-const { readShared, writeShared } = require('./db');
+const { chytatySpilnyi, zapysatySpilnyi } = require('./db');
 
-async function create(input, origin = '') {
-  const slug = createSlug();
+async function stvoryty(input, origin = '') {
+  const slug = stvorytySlah();
   const title = input.title || 'Мій розклад Таро';
 
   const record = {
@@ -15,15 +15,15 @@ async function create(input, origin = '') {
     created_at: new Date().toISOString(),
   };
 
-  const spreads = readShared();
+  const spreads = chytatySpilnyi();
   spreads.push(record);
-  writeShared(spreads);
+  zapysatySpilnyi(spreads);
 
-  return toShareResponse(record, origin);
+  return doPodilytysiaVidpovid(record, origin);
 }
 
-async function findBySlug(slug) {
-  const spreads = readShared();
+async function znajtyPoSlah(slug) {
+  const spreads = chytatySpilnyi();
   const record = spreads.find((s) => s.slug === slug);
   if (!record) {
     const err = new Error('Публічний розклад не знайдено');
@@ -33,7 +33,7 @@ async function findBySlug(slug) {
   return record;
 }
 
-function toShareResponse(spread, origin = '') {
+function doPodilytysiaVidpovid(spread, origin = '') {
   const appOrigin = origin || 'http://localhost:5173';
   const apiOrigin = origin || 'http://localhost:3000';
   const path = `/share/${spread.slug}`;
@@ -57,12 +57,12 @@ function toShareResponse(spread, origin = '') {
   };
 }
 
-function renderSocialCardSvg(spread) {
+function vidobrazatySotsialnyyKartaSvg(spread) {
   const width = 1200;
   const height = 630;
-  const title = escapeXml(spread.title);
+  const title = ekranuvatyXml(spread.title);
   const cards = spread.cards.slice(0, 5);
-  const summary = escapeXml(spread.interpretation?.summary || 'Розклад Таро з цілісним тлумаченням карт, позицій і взаємодій.');
+  const summary = ekranuvatyXml(spread.interpretation?.summary || 'Розклад Таро з цілісним тлумаченням карт, позицій і взаємодій.');
 
   const cardBlocks = cards.map((item, index) => {
     const x = 135 + index * 186;
@@ -73,8 +73,8 @@ function renderSocialCardSvg(spread) {
           <circle cx="66" cy="78" r="33" fill="none" stroke="#f4d38b" stroke-opacity="0.55"/>
           <text x="66" y="91" text-anchor="middle" font-size="34" fill="#f4d38b">✦</text>
           <text x="66" y="142" text-anchor="middle" font-size="18" font-weight="700" fill="#fff8e7">${index + 1}</text>
-          <text x="66" y="174" text-anchor="middle" font-size="13" fill="#f4d38b">${escapeXml(item.position)}</text>
-          <text x="66" y="195" text-anchor="middle" font-size="12" fill="#fff8e7">${escapeXml(reversed + item.card.name).slice(0, 34)}</text>
+          <text x="66" y="174" text-anchor="middle" font-size="13" fill="#f4d38b">${ekranuvatyXml(item.position)}</text>
+          <text x="66" y="195" text-anchor="middle" font-size="12" fill="#fff8e7">${ekranuvatyXml(reversed + item.card.name).slice(0, 34)}</text>
         </g>`;
   }).join('');
 
@@ -108,15 +108,15 @@ function renderSocialCardSvg(spread) {
   </foreignObject>
   ${cardBlocks}
   <text x="80" y="560" fill="#f4d38b" font-size="22" font-weight="800">Поділись своїм розкладом ✦</text>
-  <text x="80" y="594" fill="rgba(255,248,231,.72)" font-size="18">${escapeXml(spread.cards.map((item) => item.card.name).join(' · ')).slice(0, 120)}</text>
+  <text x="80" y="594" fill="rgba(255,248,231,.72)" font-size="18">${ekranuvatyXml(spread.cards.map((item) => item.card.name).join(' · ')).slice(0, 120)}</text>
 </svg>`;
 }
 
-function createSlug() {
+function stvorytySlah() {
   return randomBytes(5).toString('base64url');
 }
 
-function escapeXml(value) {
+function ekranuvatyXml(value) {
   return value
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -125,4 +125,4 @@ function escapeXml(value) {
     .replace(/'/g, '&apos;');
 }
 
-module.exports = { create, findBySlug, toShareResponse, renderSocialCardSvg };
+module.exports = { stvoryty, znajtyPoSlah, doPodilytysiaVidpovid, vidobrazatySotsialnyyKartaSvg };

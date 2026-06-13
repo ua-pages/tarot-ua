@@ -1,4 +1,4 @@
-function publicUser(data) {
+function publichnyiKorystuvach(data) {
   return {
     id: 'local',
     email: '',
@@ -8,4 +8,4 @@ function publicUser(data) {
   };
 }
 
-module.exports = { publicUser };
+module.exports = { publichnyiKorystuvach };

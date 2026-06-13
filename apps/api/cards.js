@@ -86,28 +86,28 @@ const SPREAD_DEFINITIONS = [
   { id: 'career5', title: 'Кар\'єра та гроші', count: 5, positions: [{ name: 'Поточна роль', description: 'Де ти зараз у професійному або фінансовому питанні.' }, { name: 'Сильна сторона', description: 'На що варто спертися, щоб рухатися швидше.' }, { name: 'Ризик', description: 'Що може забирати ресурс або створити помилку.' }, { name: 'Можливість', description: 'Де є потенціал росту, грошей або нового напрямку.' }, { name: 'Наступний крок', description: 'Конкретний фокус для дії найближчим часом.' }] },
 ];
 
-function getCards(limit) {
+function otymatyKarta(limit) {
   return TAROT_SEED.slice(0, limit || 78);
 }
 
-function resolveSpread(count, spreadType) {
+function rozviazatyRozkład(kilkist, spreadType) {
   if (spreadType) {
     const byType = SPREAD_DEFINITIONS.find((s) => s.id === spreadType);
     if (byType) return byType;
   }
-  const exact = SPREAD_DEFINITIONS.find((s) => s.count === count);
+  const exact = SPREAD_DEFINITIONS.find((s) => s.count === kilkist);
   if (exact) return exact;
-  return count >= 5 ? SPREAD_DEFINITIONS.find((s) => s.id === 'pentagram5') || SPREAD_DEFINITIONS[0] : SPREAD_DEFINITIONS[0];
+  return kilkist >= 5 ? SPREAD_DEFINITIONS.find((s) => s.id === 'pentagram5') || SPREAD_DEFINITIONS[0] : SPREAD_DEFINITIONS[0];
 }
 
-function toDayKey(date) {
+function doDenKliuch(date) {
   const year = date.getUTCFullYear();
   const month = String(date.getUTCMonth() + 1).padStart(2, '0');
   const day = String(date.getUTCDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
 
-function hash(value) {
+function heshuvaty(value) {
   let h = 0;
   for (let i = 0; i < value.length; i++) {
     h = (h * 31 + value.charCodeAt(i)) >>> 0;
@@ -115,15 +115,15 @@ function hash(value) {
   return h;
 }
 
-function meaning(item) {
+function znachennia(item) {
   return item.reversed ? item.card.meaningReversed : item.card.meaningUpright;
 }
 
-function buildSummary(spread, title, tone, majorCount, reversedCount, dominantSuit) {
+function pobuduvatyPidsumok(spread, title, tone, majorCount, reversedCount, dominantSuit) {
   const first = spread[0];
   const last = spread[spread.length - 1];
-  const firstMeaning = meaning(first);
-  const lastMeaning = meaning(last);
+  const firstMeaning = znachennia(first);
+  const lastMeaning = znachennia(last);
   const arcanaPhrase = majorCount >= Math.ceil(spread.length / 2)
     ? 'Розклад має сильний архетипний заряд: тут ідеться не лише про події, а про зміну внутрішньої ролі.'
     : 'Розклад більше говорить про практичні кроки, звички й рішення, ніж про різкий зовнішній поворот.';
@@ -140,7 +140,7 @@ function buildSummary(spread, title, tone, majorCount, reversedCount, dominantSu
   return `Цей розклад показує внутрішній процес, який починається з «${first.card.name}» у позиції «${first.position}»: ${firstMeaning} Далі він поступово приводить до «${last.card.name}»: ${lastMeaning} ${arcanaPhrase}${reversedPhrase} Найбільше психологічне навантаження зараз несе тема «${dominantSuit}».`;
 }
 
-function buildEnergyLine(majorCount, reversedCount, uprightCount, dominantSuit) {
+function pobuduvatyEnerhiiaLiniia(majorCount, reversedCount, uprightCount, dominantSuit) {
   const balance = reversedCount > uprightCount
     ? 'енергія більше внутрішня: спершу варто розібратися з опором, сумнівами або невисловленими почуттями'
     : 'енергія більше зовнішня: уже є простір для рішень, руху й конкретної дії';
@@ -150,7 +150,7 @@ function buildEnergyLine(majorCount, reversedCount, uprightCount, dominantSuit) 
   return `Загальний тон: ${balance}. Інтенсивність: ${intensity}. Домінантна сфера: ${dominantSuit}.`;
 }
 
-function buildInteractions(spread, tone) {
+function pobuduvatyVzaiemodii(spread, tone) {
   if (spread.length < 2) return [];
   const pairs = [];
   for (let i = 0; i < spread.length - 1; i++) {
@@ -175,26 +175,26 @@ function buildInteractions(spread, tone) {
   return pairs;
 }
 
-function buildAdvice(spread, tone) {
+function pobuduvatyPorada(spread, tone) {
   return spread.slice(-2).map((item) => {
     const direction = item.reversed
       ? 'не тиснути силою, а спершу повернути собі ясність у цій темі'
       : 'використати цю енергію як опору для наступного кроку';
-    if (tone === 'mystic') return `Через позицію «${item.position}» карта «${item.card.name}» радить прислухатися до знаку: ${meaning(item)} Тобто — ${direction}.`;
-    if (tone === 'practical') return `У позиції «${item.position}» карта «${item.card.name}» дає дію: ${direction}. Орієнтир: ${meaning(item)}`;
-    return `У позиції «${item.position}» карта «${item.card.name}» радить помітити свій внутрішній патерн: ${meaning(item)} Найздоровіший рух — ${direction}.`;
+    if (tone === 'mystic') return `Через позицію «${item.position}» карта «${item.card.name}» радить прислухатися до знаку: ${znachennia(item)} Тобто — ${direction}.`;
+    if (tone === 'practical') return `У позиції «${item.position}» карта «${item.card.name}» дає дію: ${direction}. Орієнтир: ${znachennia(item)}`;
+    return `У позиції «${item.position}» карта «${item.card.name}» радить помітити свій внутрішній патерн: ${znachennia(item)} Найздоровіший рух — ${direction}.`;
   });
 }
 
-function buildShadow(spread, tone) {
+function pobuduvatyTin(spread, tone) {
   const reversed = spread.find((item) => item.reversed) || spread.find((item) => item.card.arcana === 'major') || spread[0];
-  const base = `Тіньова зона проявляється через «${reversed.card.name}» у позиції «${reversed.position}»: ${meaning(reversed)}`;
+  const base = `Тіньова зона проявляється через «${reversed.card.name}» у позиції «${reversed.position}»: ${znachennia(reversed)}`;
   if (tone === 'mystic') return `${base} Це місце, де символи радять не поспішати й не плутати знак із страхом.`;
   if (tone === 'practical') return `${base} Практично це означає: перевірити припущення, не приймати рішення з імпульсу й прибрати один зайвий ризик.`;
   return `${base} Психологічно це може бути точкою захисту: там, де хочеться контролювати, уникати або доводити.`;
 }
 
-function buildNextStep(focus, adviceCard, tone) {
+function pobuduvatyNastupnyiKrok(focus, adviceCard, tone) {
   const actionKeyword = adviceCard.card.keywords[0] || 'ясність';
   const focusKeyword = focus.card.keywords[0] || 'фокус';
   if (tone === 'mystic') return `Сформулюй одне питання про «${focusKeyword}» і зроби маленький ритуальний крок у напрямку «${actionKeyword}». Не все треба вирішити сьогодні — достатньо відкрити правильні двері.`;
@@ -202,9 +202,9 @@ function buildNextStep(focus, adviceCard, tone) {
   return `Поспостерігай, де тема «${focusKeyword}» викликає найбільшу реакцію, і обери м\'який крок у сторону «${actionKeyword}» без самотиску.`;
 }
 
-async function drawSpread(count, spreadType) {
-  const definition = resolveSpread(count, spreadType);
-  const cards = getCards(78);
+async function namaliuvatyRozkład(kilkist, spreadType) {
+  const definition = rozviazatyRozkład(kilkist, spreadType);
+  const cards = otymatyKarta(78);
   const safeCount = Math.max(1, Math.min(definition.count, Math.min(cards.length, definition.positions.length)));
   const pool = [...cards];
   const spread = [];
@@ -217,10 +217,10 @@ async function drawSpread(count, spreadType) {
   return spread;
 }
 
-async function getCardOfDay(date) {
-  const cards = getCards(1);
-  const dayKey = toDayKey(date || new Date());
-  const h = hash(dayKey);
+async function otymatyKartaDen(date) {
+  const cards = otymatyKarta(1);
+  const dayKey = doDenKliuch(date || new Date());
+  const h = heshuvaty(dayKey);
   return {
     card: cards[h % cards.length],
     position: 'Карта дня',
@@ -229,12 +229,12 @@ async function getCardOfDay(date) {
   };
 }
 
-function generateRuleBasedInterpretation(spread, spreadType, tone) {
+function zgenoruvatyPravyloNa_osnoviInterpretatsiia(spread, spreadType, tone) {
   if (!spread.length) {
     return { title: 'ШІ-тлумачення', tone: tone || 'psychological', summary: 'Спершу зробіть розклад, щоб отримати цілісне тлумачення.', energy: 'Енергія ще не визначена.', interactions: [], advice: [], shadow: 'Тіньова зона з\'явиться після вибору карт.', nextStep: 'Оберіть розклад і відкрийте карти.', provider: 'rule-based' };
   }
 
-  const definition = resolveSpread(spread.length, spreadType);
+  const definition = rozviazatyRozkład(spread.length, spreadType);
   const normalizedTone = ['psychological', 'mystic', 'practical'].includes(tone) ? tone : 'psychological';
   const uprightCount = spread.filter((item) => !item.reversed).length;
   const reversedCount = spread.length - uprightCount;
@@ -249,26 +249,26 @@ function generateRuleBasedInterpretation(spread, spreadType, tone) {
   return {
     title: `ШІ-тлумачення · ${definition.title}`,
     tone: normalizedTone,
-    summary: buildSummary(spread, definition.title, normalizedTone, majorCount, reversedCount, dominantSuit),
-    energy: buildEnergyLine(majorCount, reversedCount, uprightCount, dominantSuit),
-    interactions: buildInteractions(spread, normalizedTone),
-    advice: buildAdvice(spread, normalizedTone),
-    shadow: buildShadow(spread, normalizedTone),
-    nextStep: buildNextStep(spread[0], spread[spread.length - 1], normalizedTone),
+    summary: pobuduvatyPidsumok(spread, definition.title, normalizedTone, majorCount, reversedCount, dominantSuit),
+    energy: pobuduvatyEnerhiiaLiniia(majorCount, reversedCount, uprightCount, dominantSuit),
+    interactions: pobuduvatyVzaiemodii(spread, normalizedTone),
+    advice: pobuduvatyPorada(spread, normalizedTone),
+    shadow: pobuduvatyTin(spread, normalizedTone),
+    nextStep: pobuduvatyNastupnyiKrok(spread[0], spread[spread.length - 1], normalizedTone),
     provider: 'rule-based',
   };
 }
 
-async function generateInterpretation(spread, spreadType, tone) {
-  const fallback = generateRuleBasedInterpretation(spread, spreadType, tone);
+async function zgenoruvatyInterpretatsiia(spread, spreadType, tone) {
+  const fallback = zgenoruvatyPravyloNa_osnoviInterpretatsiia(spread, spreadType, tone);
   if (!spread.length) return fallback;
 
-  const definition = resolveSpread(spread.length, spreadType);
-  const llm = await generateLlmInterpretation({ spread, definition, tone: fallback.tone, fallback });
+  const definition = rozviazatyRozkład(spread.length, spreadType);
+  const llm = await zgenoruvatyLlmInterpretatsiia({ spread, definition, tone: fallback.tone, fallback });
   return llm || fallback;
 }
 
-async function generateLlmInterpretation({ spread, definition, tone, fallback }) {
+async function zgenoruvatyLlmInterpretatsiia({ spread, definition, tone, fallback }) {
   const apiKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY || process.env.LLM_API_KEY || '';
   if (!apiKey) return null;
 
@@ -356,15 +356,15 @@ async function generateLlmInterpretation({ spread, definition, tone, fallback })
     const content = data.choices?.[0]?.message?.content;
     if (!content) return null;
 
-    const parsed = parseJson(content);
-    return normalizeLlmResponse(parsed, fallback, tone);
+    const parsed = rozibratyJson(content);
+    return normuvatyLlmVidpovid(parsed, fallback, tone);
   } catch (error) {
     console.warn(`LLM-тлумачення — використано запасний варіант: ${error.message}`);
     return null;
   }
 }
 
-function parseJson(content) {
+function rozibratyJson(content) {
   const trimmed = content.trim();
   try {
     return JSON.parse(trimmed);
@@ -375,36 +375,36 @@ function parseJson(content) {
   }
 }
 
-function normalizeLlmResponse(value, fallback, tone) {
+function normuvatyLlmVidpovid(value, fallback, tone) {
   const source = (typeof value === 'object' && value !== null) ? value : {};
   return {
-    title: stringValue(source.title, `LLM-тлумачення · ${fallback.title.replace(/^ШІ-тлумачення · /, '')}`),
+    title: riadokZnachennia(source.title, `LLM-тлумачення · ${fallback.title.replace(/^ШІ-тлумачення · /, '')}`),
     tone,
-    summary: stringValue(source.summary, fallback.summary),
-    energy: stringValue(source.energy, fallback.energy),
-    interactions: stringArray(source.interactions, fallback.interactions),
-    advice: stringArray(source.advice, fallback.advice),
-    shadow: stringValue(source.shadow, fallback.shadow),
-    nextStep: stringValue(source.nextStep, fallback.nextStep),
+    summary: riadokZnachennia(source.summary, fallback.summary),
+    energy: riadokZnachennia(source.energy, fallback.energy),
+    interactions: riadokMasyv(source.interactions, fallback.interactions),
+    advice: riadokMasyv(source.advice, fallback.advice),
+    shadow: riadokZnachennia(source.shadow, fallback.shadow),
+    nextStep: riadokZnachennia(source.nextStep, fallback.nextStep),
     provider: 'llm',
   };
 }
 
-function stringValue(value, fallback) {
+function riadokZnachennia(value, fallback) {
   return typeof value === 'string' && value.trim() ? value.trim() : fallback;
 }
 
-function stringArray(value, fallback) {
+function riadokMasyv(value, fallback) {
   if (!Array.isArray(value)) return fallback;
   const items = value.filter((item) => typeof item === 'string' && Boolean(item.trim())).map((item) => item.trim());
   return items.length ? items : fallback;
 }
 
 module.exports = {
-  getCards,
+  otymatyKarta,
   getSpreadDefinitions: () => SPREAD_DEFINITIONS,
-  drawSpread,
-  getCardOfDay,
-  generateInterpretation,
+  namaliuvatyRozkład,
+  otymatyKartaDen,
+  zgenoruvatyInterpretatsiia,
   TAROT_SEED,
 };

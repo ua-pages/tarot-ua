@@ -8,7 +8,7 @@ const share = require('./share');
 const PORT = Number(process.env.PORT || 3000);
 const HOST = process.env.HOST || '127.0.0.1';
 
-function jsonResponse(res, status, data) {
+function jsonVidpovid(res, status, data) {
   const body = JSON.stringify(data);
   res.writeHead(status, {
     'Content-Type': 'application/json; charset=utf-8',
@@ -19,12 +19,12 @@ function jsonResponse(res, status, data) {
   res.end(body);
 }
 
-function parseUrl(req) {
+function rozibratyUrl(req) {
   const base = `http://${req.headers.host || 'localhost'}`;
   return new URL(req.url, base);
 }
 
-function parseBody(req) {
+function rozibratyTilo(req) {
   return new Promise((resolve, reject) => {
     const chunks = [];
     req.on('data', (chunk) => chunks.push(chunk));
@@ -44,7 +44,7 @@ function parseBody(req) {
   });
 }
 
-async function router(req, res) {
+async function marshrutyzator(req, res) {
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
       'Access-Control-Allow-Origin': '*',
@@ -56,45 +56,45 @@ async function router(req, res) {
     return;
   }
 
-  const url = parseUrl(req);
+  const url = rozibratyUrl(req);
   const path = url.pathname;
   const method = req.method;
 
   try {
     // Здоров'я
     if (method === 'GET' && path === '/api/health') {
-      jsonResponse(res, 200, { ok: true, service: 'tarot-api', timestamp: new Date().toISOString() });
+      jsonVidpovid(res, 200, { ok: true, service: 'tarot-api', timestamp: new Date().toISOString() });
       return;
     }
 
     // Список карт
     if (method === 'GET' && path === '/api/tarot/cards') {
-      const count = Number(url.searchParams.get('count') || 78);
-      const result = cards.getCards(count);
-      jsonResponse(res, 200, result);
+      const kilkist = Number(url.searchParams.get('count') || 78);
+      const result = cards.getCards(kilkist);
+      jsonVidpovid(res, 200, result);
       return;
     }
 
     // Визначення розкладів
     if (method === 'GET' && path === '/api/tarot/spreads') {
-      jsonResponse(res, 200, cards.getSpreadDefinitions());
+      jsonVidpovid(res, 200, cards.getSpreadDefinitions());
       return;
     }
 
     // Випадковий розклад
     if (method === 'GET' && path === '/api/tarot/draw') {
-      const count = Number(url.searchParams.get('count') || 3);
+      const kilkist = Number(url.searchParams.get('count') || 3);
       const type = url.searchParams.get('type') || undefined;
-      const result = await cards.drawSpread(count, type);
-      jsonResponse(res, 200, result);
+      const result = await cards.drawSpread(kilkist, type);
+      jsonVidpovid(res, 200, result);
       return;
     }
 
     // ШІ-тлумачення
     if (method === 'POST' && path === '/api/tarot/interpretation') {
-      const body = await parseBody(req);
+      const body = await rozibratyTilo(req);
       const result = await cards.generateInterpretation(body.spread || [], body.type, body.tone);
-      jsonResponse(res, 200, result);
+      jsonVidpovid(res, 200, result);
       return;
     }
 
@@ -104,16 +104,16 @@ async function router(req, res) {
       const date = dateStr ? new Date(dateStr) : new Date();
       const safeDate = Number.isNaN(date.getTime()) ? new Date() : date;
       const result = await cards.getCardOfDay(safeDate);
-      jsonResponse(res, 200, result);
+      jsonVidpovid(res, 200, result);
       return;
     }
 
     // Створити публічний розклад
     if (method === 'POST' && path === '/api/share/spreads') {
-      const body = await parseBody(req);
+      const body = await rozibratyTilo(req);
       const origin = req.headers.origin || '';
       const result = await share.create(body, origin);
-      jsonResponse(res, 201, result);
+      jsonVidpovid(res, 201, result);
       return;
     }
 
@@ -136,23 +136,23 @@ async function router(req, res) {
       const spread = await share.findBySlug(slugMatch[1]);
       const origin = req.headers.origin || '';
       const result = share.toShareResponse(spread, origin);
-      jsonResponse(res, 200, result);
+      jsonVidpovid(res, 200, result);
       return;
     }
 
     // 404
-    jsonResponse(res, 404, { message: 'Маршрут не знайдено' });
+    jsonVidpovid(res, 404, { message: 'Маршрут не знайдено' });
   } catch (error) {
     const status = error.statusCode || 500;
     const message = status === 500 ? 'Внутрішня помилка сервера' : error.message;
     if (status === 500) {
       console.error('Невідома помилка:', error);
     }
-    jsonResponse(res, status, { message });
+    jsonVidpovid(res, status, { message });
   }
 }
 
-const server = http.createServer(router);
+const server = http.createServer(marshrutyzator);
 
 server.listen(PORT, HOST, () => {
   console.log(`API server running at http://${HOST}:${PORT}`);

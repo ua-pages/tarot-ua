@@ -1,7 +1,7 @@
 const STORAGE_KEY = 'tarot-journal';
 const MAX_ENTRIES = 50;
 
-export function loadJournal() {
+export function zavantazhytyZhurnal() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
@@ -10,14 +10,14 @@ export function loadJournal() {
   }
 }
 
-function saveJournal(entries) {
+function zberehtyZhurnal(entries) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
   } catch {}
 }
 
-export function addEntry(entry) {
-  const entries = loadJournal();
+export function dodatyZapys(entry) {
+  const entries = zavantazhytyZhurnal();
   const newEntry = {
     id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
     title: entry.title,
@@ -29,24 +29,24 @@ export function addEntry(entry) {
     createdAt: new Date().toISOString(),
   };
   entries.unshift(newEntry);
-  saveJournal(entries.slice(0, MAX_ENTRIES));
+  zberehtyZhurnal(entries.slice(0, MAX_ENTRIES));
   return newEntry;
 }
 
-export function updateEntry(id, updates) {
-  const entries = loadJournal();
+export function onovytyZapys(id, updates) {
+  const entries = zavantazhytyZhurnal();
   const index = entries.findIndex((e) => e.id === id);
   if (index === -1) return null;
   entries[index] = { ...entries[index], ...updates };
-  saveJournal(entries);
+  zberehtyZhurnal(entries);
   return entries[index];
 }
 
-export function removeEntry(id) {
-  const entries = loadJournal().filter((e) => e.id !== id);
-  saveJournal(entries);
+export function vydalytyZapys(id) {
+  const entries = zavantazhytyZhurnal().filter((e) => e.id !== id);
+  zberehtyZhurnal(entries);
 }
 
-export function loadFavorites() {
-  return loadJournal().filter((e) => e.favorite);
+export function zavantazhytyObrane() {
+  return zavantazhytyZhurnal().filter((e) => e.favorite);
 }

@@ -20,7 +20,7 @@ const MIME = {
   '.json': 'application/json',
 };
 
-function parseEnv(filePath) {
+function rozibratySeredovyshche(filePath) {
   const env = {};
   if (!fs.existsSync(filePath)) return env;
   const content = fs.readFileSync(filePath, 'utf8');
@@ -35,14 +35,14 @@ function parseEnv(filePath) {
   return env;
 }
 
-const env = parseEnv(envPath);
+const env = rozibratySeredovyshche(envPath);
 
-function injectEnv(html) {
+function iniektuvatySeredovyshche(html) {
   const envScript = `<script>window.ENV = ${JSON.stringify(env)};</script>`;
   return html.replace('    <script type="module">\n      window.ENV = window.ENV || {};\n    </script>', envScript);
 }
 
-function serveFile(res, filePath) {
+function servuvatyFajl(res, filePath) {
   const ext = path.extname(filePath);
   const contentType = MIME[ext] || 'application/octet-stream';
 
@@ -56,11 +56,11 @@ function serveFile(res, filePath) {
   }
 }
 
-function serveIndex(req, res) {
+function servuvatyIndeks(req, res) {
   const indexPath = path.join(publicDir, 'index.html');
   try {
     let html = fs.readFileSync(indexPath, 'utf8');
-    html = injectEnv(html);
+    html = iniektuvatySeredovyshche(html);
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(html);
   } catch {
@@ -69,7 +69,7 @@ function serveIndex(req, res) {
   }
 }
 
-function isSpaRoute(url) {
+function jeSpaMarshrut(url) {
   for (const spa of spaPaths) {
     if (url.startsWith(spa)) return true;
   }
@@ -80,7 +80,7 @@ import http from 'node:http';
 
 const API_TARGET = process.env.API_TARGET || 'http://127.0.0.1:3000';
 
-function proxyApi(req, res) {
+function proksiuvatyApi(req, res) {
   const url = new URL(req.url, API_TARGET);
   const options = {
     hostname: url.hostname,
@@ -106,7 +106,7 @@ const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
 
   if (url.pathname.startsWith('/api')) {
-    return proxyApi(req, res);
+    return proksiuvatyApi(req, res);
   }
 
   const cleanPath = url.pathname === '/' ? 'index.html' : url.pathname.slice(1);
@@ -114,16 +114,16 @@ const server = http.createServer((req, res) => {
   const ext = path.extname(url.pathname);
 
   if (ext && fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-    return serveFile(res, filePath);
+    return servuvatyFajl(res, filePath);
   }
-  if (isSpaRoute(url.pathname) || url.pathname === '/') {
-    return serveIndex(req, res);
+  if (jeSpaMarshrut(url.pathname) || url.pathname === '/') {
+    return servuvatyIndeks(req, res);
   }
   const altPath = path.join(publicDir, url.pathname.slice(1), 'index.html');
   if (fs.existsSync(altPath)) {
-    return serveFile(res, altPath);
+    return servuvatyFajl(res, altPath);
   }
-  return serveIndex(req, res);
+  return servuvatyIndeks(req, res);
 });
 
 server.listen(port, () => {
