@@ -1,8 +1,11 @@
 {
-  "name": "tarot-portfolio",
+  "name": "tarot-atlas",
   "version": "0.2.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "start": "node apps/web/server.js"
+    "start": "node server.js",
+    "test": "node tarot-engine.test.js",
+    "test:watch": "node --watch tarot-engine.test.js"
   }
 }
