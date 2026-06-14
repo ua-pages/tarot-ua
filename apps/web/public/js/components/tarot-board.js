@@ -98,7 +98,7 @@ export class TarotBoard extends HTMLElement {
 
     try {
       this.loadLocalUser();
-      this.syncLocalLists();
+      await this.syncLocalLists();
       await Promise.all([this.loadCardOfDay(), this.loadSpreadDefinitions()]);
 
       const sharedMatch = window.location.pathname.match(/^\/share\/([A-Za-z0-9_-]+)/);
@@ -348,9 +348,9 @@ export class TarotBoard extends HTMLElement {
     await this.generateInterpretation();
   }
 
-  syncLocalLists() {
-    this.spreadHistory = zavantazhytyZhurnal();
-    this.favoriteSpreads = zavantazhytyObrane();
+  async syncLocalLists() {
+    this.spreadHistory = await zavantazhytyZhurnal();
+    this.favoriteSpreads = await zavantazhytyObrane();
     this.updateJournals();
   }
 
@@ -362,7 +362,7 @@ export class TarotBoard extends HTMLElement {
   async saveSpreadToHistory(cards, title) {
     if (!cards.length) return;
 
-    const saved = dodatyZapys({
+    const saved = await dodatyZapys({
       title,
       spreadType: this.activeSpreadType,
       cards,
@@ -380,7 +380,7 @@ export class TarotBoard extends HTMLElement {
 
     try {
       const def = this.spreadDefinitions.find((d) => d.id === this.activeSpreadType);
-      const saved = dodatyZapys({
+      const saved = await dodatyZapys({
         title: def?.title ?? 'Обраний розклад',
         spreadType: this.activeSpreadType,
         cards: this.spread,
@@ -421,10 +421,10 @@ export class TarotBoard extends HTMLElement {
 
   async saveJournalNote(payload) {
     try {
-      const updated = onovytyZapys(payload.id, { note: payload.note });
+      const updated = await onovytyZapys(payload.id, { note: payload.note });
       if (updated) {
-        this.spreadHistory = zavantazhytyZhurnal();
-        this.favoriteSpreads = zavantazhytyObrane();
+        this.spreadHistory = await zavantazhytyZhurnal();
+        this.favoriteSpreads = await zavantazhytyObrane();
         stezhytyPodiia('journal_note_saved', { id: payload.id, noteLength: payload.note.length });
         this.copyStatus = 'Нотатку збережено.';
       }

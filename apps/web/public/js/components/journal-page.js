@@ -47,11 +47,12 @@ export class JournalPage extends HTMLElement {
         window.navigateTo(a.getAttribute('href'));
       });
     });
+    this._items = await zavantazhytyZhurnal();
     this.render();
   }
 
   render() {
-    const items = zavantazhytyZhurnal();
+    const items = this._items;
     const content = this.shadowRoot.getElementById('journal-content');
     const empty = this.shadowRoot.getElementById('journal-empty');
 
@@ -86,10 +87,10 @@ export class JournalPage extends HTMLElement {
     });
 
     content.querySelectorAll('.journal-save-note').forEach((btn) => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         const id = btn.dataset.id;
         const note = this._draftNotes[id] || '';
-        onovytyZapys(id, { note });
+        await onovytyZapys(id, { note });
         this._draftNotes[id] = note;
         btn.textContent = 'Нотатку збережено';
         setTimeout(() => { btn.textContent = 'Зберегти нотатку'; }, 2000);

@@ -3,8 +3,6 @@
   "version": "0.2.0",
   "private": true,
   "scripts": {
-    "start": "node apps/web/server.js",
-    "start:web": "node apps/web/server.js",
-    "start:api": "node apps/api/server.js"
+    "start": "node apps/web/server.js"
   }
 }

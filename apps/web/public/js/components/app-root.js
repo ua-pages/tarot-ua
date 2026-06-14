@@ -1,10 +1,27 @@
 import { initsializuvatyAnalityka, stezhytyPodiia } from '../analytics/analytics.js';
 import { onovytyFunktsiiaPrapory } from '../analytics/use-features.js';
+import { pereinjatyStyl } from '../shared-styles.js';
+
+import './app-nav.js';
+import './auth-panel.js';
+import './card-of-day-panel.js';
+import './deck-panel.js';
+import './fast-session.js';
+import './home-page.js';
+import './interpretation-panel.js';
+import './journal-page.js';
+import './library-page.js';
+import './ritual-selector.js';
+import './seo-card-page.js';
+import './seo-spread-page.js';
+import './share-panel.js';
+import './spread-board.js';
+import './stored-spreads-list.js';
+import './tarot-board.js';
+import './tarot-journal.js';
 
 const template = document.createElement('template');
 template.innerHTML = `<div id="outlet"></div>`;
-
-import { pereinjatyStyl } from '../shared-styles.js';
 
 export class AppRoot extends HTMLElement {
   constructor() {

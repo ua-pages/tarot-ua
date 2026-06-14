@@ -78,36 +78,8 @@ function jeSpaMarshrut(url) {
 
 import http from 'node:http';
 
-const API_TARGET = process.env.API_TARGET || 'http://127.0.0.1:3000';
-
-function proksiuvatyApi(req, res) {
-  const url = new URL(req.url, API_TARGET);
-  const options = {
-    hostname: url.hostname,
-    port: url.port,
-    path: url.pathname + url.search,
-    method: req.method,
-    headers: { ...req.headers },
-  };
-  delete options.headers.host;
-
-  const proxyReq = http.request(options, (proxyRes) => {
-    res.writeHead(proxyRes.statusCode, proxyRes.headers);
-    proxyRes.pipe(res);
-  });
-  proxyReq.on('error', () => {
-    res.writeHead(502);
-    res.end('API proxy error');
-  });
-  req.pipe(proxyReq);
-}
-
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
-
-  if (url.pathname.startsWith('/api')) {
-    return proksiuvatyApi(req, res);
-  }
 
   const cleanPath = url.pathname === '/' ? 'index.html' : url.pathname.slice(1);
   const filePath = path.join(publicDir, cleanPath);
