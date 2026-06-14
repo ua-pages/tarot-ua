@@ -1430,6 +1430,8 @@ img {
 
 .detail-row:last-child:nth-child(odd) {
   grid-column: 1 / -1;
+  justify-content: center;
+  text-align: center;
 }
 
 .detail-row .position,
