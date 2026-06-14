@@ -104,6 +104,14 @@ img {
   to { transform: scale(1.08) rotate(18deg); }
 }
 
+.made-in-ua {
+  text-align: center;
+  padding: 1rem 0.5rem 1.5rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: rgba(247, 234, 216, 0.35);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 1ms !important;

@@ -1,453 +1,828 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://example.com/</loc>
+    <loc>https://m00rlock.github.io/tarot-ua/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://example.com/spreads/past-present-future</loc>
+    <loc>https://m00rlock.github.io/tarot-ua/session</loc>
     <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/fast-session</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/journal</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/library</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/spreads/past-present-future</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://example.com/spreads/pentagram</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/spreads/pentagram</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://example.com/spreads/love-reading</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/spreads/love-reading</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://example.com/spreads/career-reading</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/spreads/career-reading</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/the-fool</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-fool</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/the-fool-reversed</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-fool-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/the-magician</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-magician</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/the-magician-reversed</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-magician-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/the-high-priestess</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-high-priestess</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/the-empress</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-high-priestess-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/the-emperor</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-empress</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/the-hierophant</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-empress-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/the-lovers</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-emperor</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/the-lovers-reversed</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-emperor-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/the-chariot</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-hierophant</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/strength</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-hierophant-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/the-hermit</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-lovers</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/wheel-of-fortune</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-lovers-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/justice</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-chariot</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/the-hanged-man</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-chariot-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/death</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/strength</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/death-reversed</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/strength-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/temperance</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-hermit</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/the-devil</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-hermit-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/the-devil-reversed</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/wheel-of-fortune</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/the-tower</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/wheel-of-fortune-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/the-tower-reversed</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/justice</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/the-star</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/justice-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/the-moon</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-hanged-man</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/the-moon-reversed</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-hanged-man-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/the-sun</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/death</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/judgement</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/death-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/the-world</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/temperance</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/ace-of-wands</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/temperance-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/two-of-wands</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-devil</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/three-of-wands</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-devil-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/four-of-wands</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-tower</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/five-of-wands</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-tower-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/six-of-wands</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-star</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/seven-of-wands</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-star-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/eight-of-wands</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-moon</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/nine-of-wands</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-moon-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/ten-of-wands</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-sun</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/page-of-wands</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-sun-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/knight-of-wands</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/judgement</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/queen-of-wands</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/judgement-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/king-of-wands</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-world</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/ace-of-cups</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/the-world-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/two-of-cups</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/ace-of-wands</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/three-of-cups</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/ace-of-wands-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/four-of-cups</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/two-of-wands</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/five-of-cups</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/two-of-wands-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/six-of-cups</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/three-of-wands</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/seven-of-cups</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/three-of-wands-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/eight-of-cups</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/four-of-wands</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/nine-of-cups</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/four-of-wands-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/ten-of-cups</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/five-of-wands</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/page-of-cups</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/five-of-wands-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/knight-of-cups</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/six-of-wands</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/queen-of-cups</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/six-of-wands-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/king-of-cups</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/seven-of-wands</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/ace-of-swords</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/seven-of-wands-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/two-of-swords</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/eight-of-wands</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/three-of-swords</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/eight-of-wands-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/four-of-swords</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/nine-of-wands</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/five-of-swords</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/nine-of-wands-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/six-of-swords</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/ten-of-wands</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/seven-of-swords</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/ten-of-wands-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/eight-of-swords</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/page-of-wands</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/nine-of-swords</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/page-of-wands-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/ten-of-swords</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/knight-of-wands</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/page-of-swords</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/knight-of-wands-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/knight-of-swords</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/queen-of-wands</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/queen-of-swords</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/queen-of-wands-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/king-of-swords</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/king-of-wands</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/ace-of-pentacles</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/king-of-wands-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/two-of-pentacles</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/ace-of-cups</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/three-of-pentacles</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/ace-of-cups-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/four-of-pentacles</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/two-of-cups</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/five-of-pentacles</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/two-of-cups-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/six-of-pentacles</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/three-of-cups</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/seven-of-pentacles</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/three-of-cups-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/eight-of-pentacles</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/four-of-cups</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/nine-of-pentacles</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/four-of-cups-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/ten-of-pentacles</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/five-of-cups</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/page-of-pentacles</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/five-of-cups-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/knight-of-pentacles</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/six-of-cups</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/queen-of-pentacles</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/six-of-cups-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/meaning/king-of-pentacles</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/seven-of-cups</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/seven-of-cups-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/eight-of-cups</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/eight-of-cups-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/nine-of-cups</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/nine-of-cups-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/ten-of-cups</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/ten-of-cups-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/page-of-cups</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/page-of-cups-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/knight-of-cups</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/knight-of-cups-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/queen-of-cups</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/queen-of-cups-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/king-of-cups</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/king-of-cups-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/ace-of-swords</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/ace-of-swords-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/two-of-swords</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/two-of-swords-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/three-of-swords</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/three-of-swords-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/four-of-swords</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/four-of-swords-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/five-of-swords</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/five-of-swords-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/six-of-swords</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/six-of-swords-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/seven-of-swords</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/seven-of-swords-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/eight-of-swords</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/eight-of-swords-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/nine-of-swords</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/nine-of-swords-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/ten-of-swords</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/ten-of-swords-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/page-of-swords</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/page-of-swords-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/knight-of-swords</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/knight-of-swords-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/queen-of-swords</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/queen-of-swords-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/king-of-swords</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/king-of-swords-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/ace-of-pentacles</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/ace-of-pentacles-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/two-of-pentacles</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/two-of-pentacles-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/three-of-pentacles</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/three-of-pentacles-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/four-of-pentacles</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/four-of-pentacles-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/five-of-pentacles</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/five-of-pentacles-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/six-of-pentacles</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/six-of-pentacles-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/seven-of-pentacles</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/seven-of-pentacles-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/eight-of-pentacles</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/eight-of-pentacles-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/nine-of-pentacles</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/nine-of-pentacles-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/ten-of-pentacles</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/ten-of-pentacles-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/page-of-pentacles</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/page-of-pentacles-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/knight-of-pentacles</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/knight-of-pentacles-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/queen-of-pentacles</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/queen-of-pentacles-reversed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/king-of-pentacles</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://m00rlock.github.io/tarot-ua/meaning/king-of-pentacles-reversed</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 </urlset>

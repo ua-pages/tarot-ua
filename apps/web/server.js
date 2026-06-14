@@ -20,7 +20,7 @@ const MIME = {
   '.json': 'application/json',
 };
 
-function rozibratySeredovyshche(filePath) {
+function parseEnv(filePath) {
   const env = {};
   if (!fs.existsSync(filePath)) return env;
   const content = fs.readFileSync(filePath, 'utf8');
@@ -35,14 +35,14 @@ function rozibratySeredovyshche(filePath) {
   return env;
 }
 
-const env = rozibratySeredovyshche(envPath);
+const env = parseEnv(envPath);
 
-function iniektuvatySeredovyshche(html) {
+function injectEnv(html) {
   const envScript = `<script>window.ENV = ${JSON.stringify(env)};</script>`;
-  return html.replace('    <script type="module">\n      window.ENV = window.ENV || {};\n    </script>', envScript);
+  return html.replace('<script>\n      window.ENV = window.ENV || {};', envScript + '\n      ');
 }
 
-function servuvatyFajl(res, filePath) {
+function serveFile(res, filePath) {
   const ext = path.extname(filePath);
   const contentType = MIME[ext] || 'application/octet-stream';
 
@@ -56,11 +56,11 @@ function servuvatyFajl(res, filePath) {
   }
 }
 
-function servuvatyIndeks(req, res) {
+function serveIndex(req, res) {
   const indexPath = path.join(publicDir, 'index.html');
   try {
     let html = fs.readFileSync(indexPath, 'utf8');
-    html = iniektuvatySeredovyshche(html);
+    html = injectEnv(html);
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(html);
   } catch {
@@ -69,7 +69,7 @@ function servuvatyIndeks(req, res) {
   }
 }
 
-function jeSpaMarshrut(url) {
+function isSpaRoute(url) {
   for (const spa of spaPaths) {
     if (url.startsWith(spa)) return true;
   }
@@ -81,7 +81,8 @@ import http from 'node:http';
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
 
-  const cleanPath = url.pathname === '/' ? 'index.html' : url.pathname.slice(1);
+  const pagePath = url.pathname.replace(/^\/tarot-ua(?=\/|$)/, '');
+  const cleanPath = pagePath === '/' ? 'index.html' : pagePath.slice(1);
   const filePath = path.join(publicDir, cleanPath);
   const ext = path.extname(url.pathname);
 

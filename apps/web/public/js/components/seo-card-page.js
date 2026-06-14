@@ -1,4 +1,4 @@
-import { zavantazhytyKarta } from '../services/api.js';
+import { fetchCards } from '../services/api.js';
 import { buildFaqJsonLd, setJsonLd, setSeoMeta } from '../seo/meta.js';
 import { CARD_DEFAULT_DESCRIPTION, CARD_DEFAULT_TITLE, ORG_NAME } from '../constants/seo.js';
 
@@ -54,7 +54,7 @@ template.innerHTML = `
   </main>
 `;
 
-import { pereinjatyStyl } from '../shared-styles.js';
+import { adoptStyle } from '../shared-styles.js';
 
 export class SeoCardPage extends HTMLElement {
   constructor() {
@@ -75,7 +75,7 @@ export class SeoCardPage extends HTMLElement {
   }
 
   async connectedCallback() {
-    await pereinjatyStyl(this);
+    await adoptStyle(this);
     if (this._slug) this.loadCard();
     const backBtn = this.shadowRoot.querySelector('.seo-back');
     if (backBtn) {
@@ -115,7 +115,7 @@ export class SeoCardPage extends HTMLElement {
     root.getElementById('card-content').style.display = 'none';
 
     try {
-      const cards = await zavantazhytyKarta(78);
+      const cards = await fetchCards(78);
       this._card = cards.find((item) => item.id === this.cleanSlug) || null;
 
       root.getElementById('loading-state').style.display = 'none';

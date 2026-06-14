@@ -30,7 +30,7 @@ function loadPostHogScript() {
   return loadPromise;
 }
 
-function ochystytyCherha() {
+function flushQueue() {
   if (!window.posthog) return;
   while (queuedEvents.length) {
     const event = queuedEvents.shift();
@@ -38,7 +38,7 @@ function ochystytyCherha() {
   }
 }
 
-export async function initsializuvatyAnalityka() {
+export async function initAnalytics() {
   if (initialized || !IS_BROWSER || !POSTHOG_KEY || !ANALYTICS_ENABLED || isDoNotTrackEnabled()) return;
   await loadPostHogScript();
   if (!window.posthog) return;
@@ -54,11 +54,11 @@ export async function initsializuvatyAnalityka() {
   });
 
   initialized = true;
-  stezhytyStorinkaPerehliad();
-  ochystytyCherha();
+  trackPageView();
+  flushQueue();
 }
 
-export function stezhytyPodiia(name, properties) {
+export function trackEvent(name, properties) {
   if (!IS_BROWSER || !ANALYTICS_ENABLED || isDoNotTrackEnabled()) return;
 
   const payload = { path: window.location.pathname, ...properties };
@@ -70,14 +70,14 @@ export function stezhytyPodiia(name, properties) {
   window.posthog.capture(name, payload);
 }
 
-export function stezhytyStorinkaPerehliad() {
-  stezhytyPodiia('$pageview', {
+export function trackPageView() {
+  trackEvent('$pageview', {
     title: document.title,
     url: window.location.href
   });
 }
 
-export function identyfikuvatyKorystuvach(user) {
+export function identifyUser(user) {
   if (!IS_BROWSER || !window.posthog || !user?.id) return;
   window.posthog.identify(user.id, {
     email: user.email,
@@ -86,12 +86,12 @@ export function identyfikuvatyKorystuvach(user) {
   });
 }
 
-export function skynutyAnalitykaKorystuvach() {
+export function resetAnalyticsUser() {
   if (!IS_BROWSER || !window.posthog) return;
   window.posthog.reset();
 }
 
-export function jeFunktsiiaUvimknutyy(key, fallback = false) {
+export function isFeatureEnabled(key, fallback = false) {
   if (!IS_BROWSER || !window.posthog?.getFeatureFlag) return fallback;
   const value = window.posthog.getFeatureFlag(key);
   if (typeof value === 'boolean') return value;
@@ -99,23 +99,23 @@ export function jeFunktsiiaUvimknutyy(key, fallback = false) {
   return fallback;
 }
 
-export async function perezavantazhytyFunktsiiaPrapory() {
+export async function reloadFeatureFlags() {
   if (!IS_BROWSER || !window.posthog?.reloadFeatureFlags) return;
   await window.posthog.reloadFeatureFlags();
 }
 
-export function vstanovytyAnalitykaOptsiiaVykhid(value) {
+export function setAnalyticsOptOut(value) {
   if (!IS_BROWSER) return;
   window.localStorage.setItem('tarot-analytics-opt-out', String(value));
   if (value) {
     window.posthog?.opt_out_capturing?.();
   } else {
     window.posthog?.opt_in_capturing?.();
-    void initsializuvatyAnalityka();
+    void initAnalytics();
   }
 }
 
-export function rozkładAnalitykaVantazh(spread, spreadType) {
+export function spreadAnalyticsPayload(spread, spreadType) {
   return {
     spreadType,
     cardsCount: spread.length,
@@ -125,7 +125,7 @@ export function rozkładAnalitykaVantazh(spread, spreadType) {
   };
 }
 
-export function interpretatsiiaAnalitykaVantazh(input) {
+export function interpretationAnalyticsPayload(input) {
   return {
     ...spreadAnalyticsPayload(input.spread, input.spreadType),
     tone: input.tone,

@@ -6,7 +6,7 @@ template.innerHTML = `
   </section>
 `;
 
-import { pereinjatyStyl } from '../shared-styles.js';
+import { adoptStyle } from '../shared-styles.js';
 
 export class StoredSpreadsList extends HTMLElement {
   constructor() {
@@ -16,7 +16,7 @@ export class StoredSpreadsList extends HTMLElement {
   }
 
   async connectedCallback() {
-    await pereinjatyStyl(this);
+    await adoptStyle(this);
     this.render();
   }
 

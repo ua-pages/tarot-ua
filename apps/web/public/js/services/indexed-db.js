@@ -3,7 +3,7 @@ const DB_VERSION = 1;
 
 let db = null;
 
-function vidkrytyBD() {
+function openDB() {
   if (db) return Promise.resolve(db);
 
   return new Promise((resolve, reject) => {
@@ -36,8 +36,8 @@ function vidkrytyBD() {
   });
 }
 
-function vykonatyTransaktsiiu(storeName, mode, callback) {
-  return vidkrytyBD().then((database) => {
+function executeTransaction(storeName, mode, callback) {
+  return openDB().then((database) => {
     return new Promise((resolve, reject) => {
       const transaction = database.transaction(storeName, mode);
       const store = transaction.objectStore(storeName);
@@ -47,10 +47,10 @@ function vykonatyTransaktsiiu(storeName, mode, callback) {
   });
 }
 
-// Журнал (щоденник)
+// Journal
 
-export function otrymatyVsiZapysy() {
-  return vykonatyTransaktsiiu('journal', 'readonly', (store, resolve, reject) => {
+export function getAllEntries() {
+  return executeTransaction('journal', 'readonly', (store, resolve, reject) => {
     const req = store.getAll();
     req.onsuccess = () => {
       const entries = req.result || [];
@@ -61,8 +61,8 @@ export function otrymatyVsiZapysy() {
   });
 }
 
-export function dodatyZapysDoZhumalu(entry) {
-  return vykonatyTransaktsiiu('journal', 'readwrite', (store, resolve, reject) => {
+export function addEntryToJournal(entry) {
+  return executeTransaction('journal', 'readwrite', (store, resolve, reject) => {
     const newEntry = {
       id: crypto.randomUUID(),
       ...entry,
@@ -74,8 +74,8 @@ export function dodatyZapysDoZhumalu(entry) {
   });
 }
 
-export function onovytyZapysUZhumali(id, updates) {
-  return vykonatyTransaktsiiu('journal', 'readwrite', (store, resolve, reject) => {
+export function updateEntryInJournal(id, updates) {
+  return executeTransaction('journal', 'readwrite', (store, resolve, reject) => {
     const getReq = store.get(id);
     getReq.onsuccess = () => {
       const existing = getReq.result;
@@ -92,16 +92,16 @@ export function onovytyZapysUZhumali(id, updates) {
   });
 }
 
-export function vydalytyZapysIZhumalu(id) {
-  return vykonatyTransaktsiiu('journal', 'readwrite', (store, resolve, reject) => {
+export function deleteEntryFromJournal(id) {
+  return executeTransaction('journal', 'readwrite', (store, resolve, reject) => {
     const req = store.delete(id);
     req.onsuccess = () => resolve();
     req.onerror = () => reject(req.error);
   });
 }
 
-export function otrymatyObraniZapysy() {
-  return vykonatyTransaktsiiu('journal', 'readonly', (store, resolve, reject) => {
+export function getFavoriteEntries() {
+  return executeTransaction('journal', 'readonly', (store, resolve, reject) => {
     const index = store.index('favorite');
     const req = index.getAll(true);
     req.onsuccess = () => {
@@ -113,46 +113,46 @@ export function otrymatyObraniZapysy() {
   });
 }
 
-// Спільні розклади (локальний шеринг)
+// Shared spreads (local sharing)
 
-export function zberehtySpilnyiRozkład(spread) {
-  return vykonatyTransaktsiiu('shared-spreads', 'readwrite', (store, resolve, reject) => {
+export function saveSharedSpread(spread) {
+  return executeTransaction('shared-spreads', 'readwrite', (store, resolve, reject) => {
     const req = store.add(spread);
     req.onsuccess = () => resolve(spread);
     req.onerror = () => reject(req.error);
   });
 }
 
-export function otrymatySpilnyiRozkład(slug) {
-  return vykonatyTransaktsiiu('shared-spreads', 'readonly', (store, resolve, reject) => {
+export function getSharedSpread(slug) {
+  return executeTransaction('shared-spreads', 'readonly', (store, resolve, reject) => {
     const req = store.get(slug);
     req.onsuccess = () => resolve(req.result || null);
     req.onerror = () => reject(req.error);
   });
 }
 
-// Налаштування
+// Settings
 
-export function zberehtyNalashtuvannia(key, value) {
-  return vykonatyTransaktsiiu('settings', 'readwrite', (store, resolve, reject) => {
+export function saveSettings(key, value) {
+  return executeTransaction('settings', 'readwrite', (store, resolve, reject) => {
     const req = store.put({ key, value });
     req.onsuccess = () => resolve();
     req.onerror = () => reject(req.error);
   });
 }
 
-export function otrymatyNalashtuvannia(key) {
-  return vykonatyTransaktsiiu('settings', 'readonly', (store, resolve, reject) => {
+export function getSettings(key) {
+  return executeTransaction('settings', 'readonly', (store, resolve, reject) => {
     const req = store.get(key);
     req.onsuccess = () => resolve(req.result?.value ?? null);
     req.onerror = () => reject(req.error);
   });
 }
 
-// Міграція з localStorage
+// Migration from localStorage
 
-export function mihruvatyZLocalStorage() {
-  return vykonatyTransaktsiiu('journal', 'readonly', (store, resolve, reject) => {
+export function migrateFromLocalStorage() {
+  return executeTransaction('journal', 'readonly', (store, resolve, reject) => {
     const countReq = store.count();
     countReq.onsuccess = () => resolve(countReq.result === 0);
     countReq.onerror = () => reject(countReq.error);
@@ -164,7 +164,7 @@ export function mihruvatyZLocalStorage() {
     try { entries = JSON.parse(raw); }
     catch { return false; }
     if (!Array.isArray(entries) || !entries.length) return false;
-    return vykonatyTransaktsiiu('journal', 'readwrite', (store, resolve, reject) => {
+    return executeTransaction('journal', 'readwrite', (store, resolve, reject) => {
       const maxEntries = 200;
       const toMigrate = entries.slice(0, maxEntries);
       let completed = 0;

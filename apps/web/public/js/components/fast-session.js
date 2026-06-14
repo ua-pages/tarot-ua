@@ -1,8 +1,8 @@
-import { kartaZnachennia, zatrymty } from '../utils.js';
-import { pereinjatyStyl } from '../shared-styles.js';
-import { namaliuvatyRozkład, zavantazhytyRozkładVyznachennia, zavantazhytyRozkładInterpretatsiia } from '../services/api.js';
-import { zberehtyRozkładSesiia, zavantazhytyRozkładSesiia, zberehtyInterpretatsiiaSesiia, zavantazhytyInterpretatsiiaSesiia, zavantazhytyNikneym } from '../services/session-storage.js';
-import { stezhytyPodiia } from '../analytics/analytics.js';
+import { getCardMeaning, sleep } from '../utils.js';
+import { adoptStyle } from '../shared-styles.js';
+import { drawSpreadCards, fetchSpreadDefinitions, fetchSpreadInterpretation } from '../services/api.js';
+import { saveSpreadSession, loadSpreadSession, saveInterpretationSession, loadInterpretationSession, loadNickname } from '../services/session-storage.js';
+import { trackEvent } from '../analytics/analytics.js';
 
 const SPREAD_META = [
   { id: 'classic3', icon: '✦', card: 'the-magician', name: 'Три карти', kicker: 'Класичний' },
@@ -80,8 +80,8 @@ export class FastSession extends HTMLElement {
   }
 
   async connectedCallback() {
-    await pereinjatyStyl(this);
-    const nickname = zavantazhytyNikneym();
+    await adoptStyle(this);
+    const nickname = loadNickname();
     const sub = this.shadowRoot.getElementById('session-subtitle');
     if (nickname && sub) {
       sub.textContent = `Вітаю, ${nickname}. Оберіть практику — карти самі розкажуть історію.`;
@@ -90,7 +90,7 @@ export class FastSession extends HTMLElement {
     this.drawSpreadGrid();
     this.spawnRunes();
     try {
-      this.spreadDefinitions = await zavantazhytyRozkładVyznachennia();
+      this.spreadDefinitions = await fetchSpreadDefinitions();
     } catch {}
     this.tryRestoreSession();
   }
@@ -130,7 +130,7 @@ export class FastSession extends HTMLElement {
     const grid = this.shadowRoot.getElementById('spread-grid');
     grid.innerHTML = SPREAD_META.map((s) => `
       <div class="mystic-spread-card" data-id="${s.id}">
-        <img src="/cards/${s.card}.svg" alt="" class="mystic-spread-mini-card" loading="lazy" onerror="this.style.display='none'">
+        <img src="cards/${s.card}.svg" alt="" class="mystic-spread-mini-card" loading="lazy" onerror="this.style.display='none'">
         <span class="icon">${s.icon}</span>
         <span class="name">${s.name}</span>
         <span class="kicker">${s.kicker}</span>
@@ -148,11 +148,11 @@ export class FastSession extends HTMLElement {
   }
 
   tryRestoreSession() {
-    const saved = zavantazhytyRozkładSesiia();
+    const saved = loadSpreadSession();
     if (saved?.spread?.length) {
       this.activeSpreadType = saved.spreadType;
       this.spread = saved.spread;
-      this.interpretation = zavantazhytyInterpretatsiiaSesiia();
+      this.interpretation = loadInterpretationSession();
       this.renderSpread();
       if (this.interpretation) this.renderInterpretation();
       this.highlightSelected();
@@ -176,23 +176,23 @@ export class FastSession extends HTMLElement {
     try {
       const definition = this.spreadDefinitions.find((d) => d.id === type);
       const [drawnCards] = await Promise.all([
-        namaliuvatyRozkład(definition?.count ?? 3, type),
-        zatrymty(600)
+        drawSpreadCards(definition?.count ?? 3, type),
+        sleep(600)
       ]);
       this.spread = drawnCards;
-      zberehtyRozkładSesiia({ spreadType: type, spread: drawnCards });
-      stezhytyPodiia('fast_spread_drawn', { spreadType: type, cardsCount: drawnCards.length });
+      saveSpreadSession({ spreadType: type, spread: drawnCards });
+      trackEvent('fast_spread_drawn', { spreadType: type, cardsCount: drawnCards.length });
 
       this.renderSpread();
       this.glowPanel('cards-section');
 
-      const interp = await zavantazhytyRozkładInterpretatsiia(drawnCards, type, 'psychological');
+      const interp = await fetchSpreadInterpretation(drawnCards, type, 'psychological');
       this.interpretation = interp;
-      zberehtyInterpretatsiiaSesiia(interp);
+      saveInterpretationSession(interp);
 
       this.renderInterpretation();
       this.glowPanel('interpretation-section');
-      stezhytyPodiia('fast_interpretation_generated', { spreadType: type, provider: interp.provider });
+      trackEvent('fast_interpretation_generated', { spreadType: type, provider: interp.provider });
     } catch (err) {
       this.showError(err instanceof Error ? err.message : 'Щось пішло не так');
     } finally {
@@ -232,10 +232,10 @@ export class FastSession extends HTMLElement {
       <div class="mystic-card-slot revealing" style="animation-delay:${i * 0.2}s">
         <img src="${item.card.image}" alt="${item.card.name}"
           loading="lazy"
-          onerror="this.src='/cards/tarot-placeholder.svg'">
+          onerror="this.src='cards/tarot-placeholder.svg'">
         <div class="position">${item.position}</div>
         <div class="card-name">${item.card.name}${item.reversed ? ' ⇄' : ''}</div>
-        <div class="card-meaning">${kartaZnachennia(item)}</div>
+        <div class="card-meaning">${getCardMeaning(item)}</div>
       </div>
     `).join('');
 
@@ -285,7 +285,7 @@ export class FastSession extends HTMLElement {
       `<div class="post-fragment">
         <span class="post-label">${item.position}</span>
         <span class="post-card-name">${item.card.name}${item.reversed ? ' ⇄' : ''}</span>
-        <span class="post-insight">${pershyiRechennia(kartaZnachennia(item))}</span>
+        <span class="post-insight">${pershyiRechennia(getCardMeaning(item))}</span>
       </div>`
     ).join('');
 

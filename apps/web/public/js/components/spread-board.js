@@ -1,4 +1,4 @@
-import { kartaZnachennia } from '../utils.js';
+import { getCardMeaning } from '../utils.js';
 import { CARD_REVEAL_DELAY_STEP, DETAIL_REVEAL_OFFSET, DETAIL_REVEAL_DELAY_STEP } from '../constants/animations.js';
 
 const template = document.createElement('template');
@@ -35,7 +35,7 @@ template.innerHTML = `
   </section>
 `;
 
-import { pereinjatyStyl } from '../shared-styles.js';
+import { adoptStyle } from '../shared-styles.js';
 
 export class SpreadBoard extends HTMLElement {
   constructor() {
@@ -52,7 +52,7 @@ export class SpreadBoard extends HTMLElement {
   }
 
   async connectedCallback() {
-    await pereinjatyStyl(this);
+    await adoptStyle(this);
     this.shadowRoot.getElementById('fav-btn').addEventListener('click', () => {
       this.dispatchEvent(new CustomEvent('favorite'));
     });
@@ -191,7 +191,7 @@ export class SpreadBoard extends HTMLElement {
 
       const pMean = document.createElement('p');
       pMean.className = 'meaning';
-      pMean.textContent = kartaZnachennia(item);
+      pMean.textContent = getCardMeaning(item);
       article.appendChild(pMean);
 
       container.appendChild(article);
@@ -278,7 +278,7 @@ export class SpreadBoard extends HTMLElement {
 
       const meanP = document.createElement('p');
       meanP.className = 'meaning';
-      meanP.textContent = kartaZnachennia(item);
+      meanP.textContent = getCardMeaning(item);
       div.appendChild(meanP);
 
       row.appendChild(div);

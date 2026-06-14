@@ -1,7 +1,7 @@
 const previewWidth = 1200;
 const previewHeight = 630;
 
-export async function pobuduvatyPodilytysiaPerehliad(shared) {
+export async function buildSharePreview(shared) {
   const canvas = document.createElement('canvas');
   canvas.width = previewWidth;
   canvas.height = previewHeight;
@@ -22,14 +22,14 @@ export async function pobuduvatyPodilytysiaPerehliad(shared) {
   ctx.fillStyle = orb;
   ctx.fillRect(0, 0, previewWidth, previewHeight);
 
-  namaliuvatyZirky(ctx);
-  namaliuvatyPerehliadTekst(ctx, shared.title, shared.interpretation?.summary || 'Розклад Таро з цілісним тлумаченням карт, позицій і взаємодій.');
-  namaliuvatyPerehliadKarta(ctx, shared.cards);
+  drawStars(ctx);
+  drawPreviewText(ctx, shared.title, shared.interpretation?.summary || 'Розклад Таро з цілісним тлумаченням карт, позицій і взаємодій.');
+  drawPreviewCards(ctx, shared.cards);
 
   return canvas.toDataURL('image/png');
 }
 
-function namaliuvatyZirky(ctx) {
+function drawStars(ctx) {
   const stars = [
     [150, 120], [245, 72], [1030, 92], [980, 510], [1080, 420], [92, 500], [650, 96], [780, 545]
   ];
@@ -41,21 +41,21 @@ function namaliuvatyZirky(ctx) {
   }
 }
 
-function namaliuvatyPerehliadTekst(ctx, title, summary) {
+function drawPreviewText(ctx, title, summary) {
   ctx.fillStyle = '#f4d38b';
   ctx.font = '800 24px Inter, Arial, sans-serif';
   ctx.fillText('ТАРО ЧЕРІОТ', 80, 88);
 
   ctx.fillStyle = '#fff8e7';
   ctx.font = '900 52px Inter, Arial, sans-serif';
-  obernutyPolotnoTekst(ctx, title, 80, 154, 880, 58, 2);
+  wrapCanvasText(ctx, title, 80, 154, 880, 58, 2);
 
   ctx.fillStyle = 'rgba(255,248,231,0.82)';
   ctx.font = '400 23px Inter, Arial, sans-serif';
-  obernutyPolotnoTekst(ctx, summary, 80, 210, 880, 32, 2);
+  wrapCanvasText(ctx, summary, 80, 210, 880, 32, 2);
 }
 
-function namaliuvatyPerehliadKarta(ctx, cards) {
+function drawPreviewCards(ctx, cards) {
   const shown = cards.slice(0, 5);
   const startX = shown.length === 3 ? 255 : 135;
   const gap = shown.length === 3 ? 230 : 186;
@@ -67,7 +67,7 @@ function namaliuvatyPerehliadKarta(ctx, cards) {
     cardGradient.addColorStop(0, '#241739');
     cardGradient.addColorStop(1, '#6d3f77');
 
-    okruhlytyPriamokutnyk(ctx, x, y, 132, 214, 18);
+    roundRect(ctx, x, y, 132, 214, 18);
     ctx.fillStyle = cardGradient;
     ctx.fill();
     ctx.strokeStyle = 'rgba(244,211,139,0.58)';
@@ -94,7 +94,7 @@ function namaliuvatyPerehliadKarta(ctx, cards) {
 
     ctx.fillStyle = '#fff8e7';
     ctx.font = '700 12px Inter, Arial, sans-serif';
-    obernutyPolotnoTekst(ctx, `${item.reversed ? '↻ ' : ''}${item.card.name}`, x + 14, y + 194, 104, 16, 2, 'center');
+    wrapCanvasText(ctx, `${item.reversed ? '↻ ' : ''}${item.card.name}`, x + 14, y + 194, 104, 16, 2, 'center');
     ctx.textAlign = 'start';
   });
 
@@ -104,10 +104,10 @@ function namaliuvatyPerehliadKarta(ctx, cards) {
 
   ctx.fillStyle = 'rgba(255,248,231,0.72)';
   ctx.font = '400 18px Inter, Arial, sans-serif';
-  obernutyPolotnoTekst(ctx, cards.map((item) => item.card.name).join(' · '), 80, 594, 1040, 24, 1);
+  wrapCanvasText(ctx, cards.map((item) => item.card.name).join(' · '), 80, 594, 1040, 24, 1);
 }
 
-function obernutyPolotnoTekst(ctx, text, x, y, maxWidth, lineHeight, maxLines = 3, align = 'start') {
+function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 3, align = 'start') {
   const words = text.split(' ');
   let line = '';
   let lineCount = 0;
@@ -132,7 +132,7 @@ function obernutyPolotnoTekst(ctx, text, x, y, maxWidth, lineHeight, maxLines = 
   ctx.textAlign = previousAlign;
 }
 
-function okruhlytyPriamokutnyk(ctx, x, y, width, height, radius) {
+function roundRect(ctx, x, y, width, height, radius) {
   ctx.beginPath();
   ctx.moveTo(x + radius, y);
   ctx.arcTo(x + width, y, x + width, y + height, radius);

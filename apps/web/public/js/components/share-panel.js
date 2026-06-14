@@ -19,7 +19,7 @@ template.innerHTML = `
   </aside>
 `;
 
-import { pereinjatyStyl } from '../shared-styles.js';
+import { adoptStyle } from '../shared-styles.js';
 
 export class SharePanel extends HTMLElement {
   constructor() {
@@ -31,7 +31,7 @@ export class SharePanel extends HTMLElement {
   }
 
   async connectedCallback() {
-    await pereinjatyStyl(this);
+    await adoptStyle(this);
     this.shadowRoot.getElementById('copy-url-btn').addEventListener('click', () => {
       this.dispatchEvent(new CustomEvent('copy-url'));
     });

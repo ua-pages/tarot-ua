@@ -1,32 +1,35 @@
-function onovytyMeta(selector, stvoryty, valueSetter) {
+function updateMeta(selector, create, valueSetter) {
   let element = document.head.querySelector(selector);
   if (!element) {
-    element = stvoryty();
+    element = create();
     document.head.appendChild(element);
   }
   valueSetter(element);
 }
 
-function absoliutnyiUrl(pathOrUrl) {
+function absoluteUrl(pathOrUrl) {
   if (/^https?:\/\//.test(pathOrUrl)) return pathOrUrl;
-  return `${window.location.origin}${pathOrUrl.startsWith('/') ? pathOrUrl : `/${pathOrUrl}`}`;
+  const base = (document.querySelector('base')?.getAttribute('href') || '/').replace(/\/+$/, '');
+  const pathClean = pathOrUrl.startsWith('/') ? pathOrUrl : `/${pathOrUrl}`;
+  const fullPath = pathClean.startsWith(base) ? pathClean : `${base}${pathClean}`;
+  return `${window.location.origin}${fullPath}`;
 }
 
 export function setSeoMeta(input) {
   const title = input.title.trim();
   const description = input.description.trim();
-  const canonicalUrl = absoliutnyiUrl(input.canonicalPath || window.location.pathname);
-  const image = absoliutnyiUrl(input.image || '/seo/og-default.svg');
+  const canonicalUrl = absoluteUrl(input.canonicalPath || window.location.pathname);
+  const image = absoluteUrl(input.image || 'seo/og-default.svg');
 
   document.title = title;
 
-  onovytyMeta('meta[name="description"]', () => {
+  updateMeta('meta[name="description"]', () => {
     const meta = document.createElement('meta');
     meta.setAttribute('name', 'description');
     return meta;
   }, (meta) => meta.setAttribute('content', description));
 
-  onovytyMeta('link[rel="canonical"]', () => {
+  updateMeta('link[rel="canonical"]', () => {
     const link = document.createElement('link');
     link.setAttribute('rel', 'canonical');
     return link;
@@ -46,7 +49,7 @@ export function setSeoMeta(input) {
 
   Object.entries(og).forEach(([property, content]) => {
     const selector = property.startsWith('twitter:') ? `meta[name="${property}"]` : `meta[property="${property}"]`;
-    onovytyMeta(selector, () => {
+    updateMeta(selector, () => {
       const meta = document.createElement('meta');
       if (property.startsWith('twitter:')) meta.setAttribute('name', property);
       else meta.setAttribute('property', property);

@@ -47,6 +47,6 @@ export const SPREAD_USE_CASE = {
   classic3: 'Класичний розклад із трьох карт допомагає швидко побачити минуле, поточний стан і найближчий напрямок розвитку.',
 };
 
-export function rozkładMeta(type) {
+export function getSpreadMeta(type) {
   return SPREAD_META[type];
 }

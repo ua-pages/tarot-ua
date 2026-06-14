@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
-Sitemap: https://example.com/sitemap.xml
+
+Sitemap: https://m00rlock.github.io/tarot-ua/sitemap.xml

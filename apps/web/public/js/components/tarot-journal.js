@@ -1,4 +1,4 @@
-import { formatuvatyData, hrupaElementyPoMisats, mnozhynatyKarta } from '../utils.js';
+import { formatDate, groupEntriesByMonth, pluralizeCard } from '../utils.js';
 import { TONE_LABELS } from '../constants/interpretation.js';
 
 const template = document.createElement('template');
@@ -16,7 +16,7 @@ template.innerHTML = `
   </section>
 `;
 
-import { pereinjatyStyl } from '../shared-styles.js';
+import { adoptStyle } from '../shared-styles.js';
 
 export class TarotJournal extends HTMLElement {
   constructor() {
@@ -29,7 +29,7 @@ export class TarotJournal extends HTMLElement {
   }
 
   async connectedCallback() {
-    await pereinjatyStyl(this);
+    await adoptStyle(this);
     this.render();
   }
 
@@ -54,7 +54,7 @@ export class TarotJournal extends HTMLElement {
     const timeline = this.shadowRoot.getElementById('journal-timeline');
     timeline.innerHTML = '';
 
-    const groups = hrupaElementyPoMisats(items);
+    const groups = groupEntriesByMonth(items);
     groups.forEach((group) => {
       const monthSection = document.createElement('section');
       monthSection.className = 'journal-month';
@@ -81,7 +81,7 @@ export class TarotJournal extends HTMLElement {
       <span class="journal-icon">✦</span>
       <span class="journal-main">
         <strong>${entry.title}</strong>
-        <small>${formatuvatyData(entry.createdAt)} · ${entry.cards.length} ${mnozhynatyKarta(entry.cards.length)} · ${this.toneLabel(entry.interpretation?.tone)}</small>
+        <small>${formatDate(entry.createdAt)} · ${entry.cards.length} ${pluralizeCard(entry.cards.length)} · ${this.toneLabel(entry.interpretation?.tone)}</small>
       </span>
       <span class="journal-chevron">${this._expandedId === entry.id ? '−' : '+'}</span>
     `;

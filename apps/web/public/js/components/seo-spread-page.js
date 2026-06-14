@@ -1,4 +1,4 @@
-import { zavantazhytyRozkładVyznachennia } from '../services/api.js';
+import { fetchSpreadDefinitions } from '../services/api.js';
 import { buildFaqJsonLd, setJsonLd, setSeoMeta } from '../seo/meta.js';
 import { ORG_NAME, SPREAD_DEFAULT_DESCRIPTION } from '../constants/seo.js';
 import { SPREAD_SLUG_TO_TYPE, SPREAD_USE_CASE } from '../constants/spreads.js';
@@ -37,7 +37,7 @@ template.innerHTML = `
   </main>
 `;
 
-import { pereinjatyStyl } from '../shared-styles.js';
+import { adoptStyle } from '../shared-styles.js';
 
 export class SeoSpreadPage extends HTMLElement {
   constructor() {
@@ -58,7 +58,7 @@ export class SeoSpreadPage extends HTMLElement {
   }
 
   async connectedCallback() {
-    await pereinjatyStyl(this);
+    await adoptStyle(this);
     if (this._slug) this.loadSpread();
     this.shadowRoot.querySelector('.seo-back').addEventListener('click', (e) => {
       e.preventDefault();
@@ -73,7 +73,7 @@ export class SeoSpreadPage extends HTMLElement {
     root.getElementById('spread-content').style.display = 'none';
 
     try {
-      const definitions = await zavantazhytyRozkładVyznachennia();
+      const definitions = await fetchSpreadDefinitions();
       const type = SPREAD_SLUG_TO_TYPE[this._slug] || this._slug;
       this._spreadDefinition = definitions.find((item) => item.id === type) || null;
 

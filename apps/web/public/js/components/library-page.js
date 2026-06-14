@@ -19,7 +19,7 @@ template.innerHTML = `
   </main>
 `;
 
-import { pereinjatyStyl } from '../shared-styles.js';
+import { adoptStyle } from '../shared-styles.js';
 
 export class LibraryPage extends HTMLElement {
   constructor() {
@@ -29,7 +29,7 @@ export class LibraryPage extends HTMLElement {
   }
 
   async connectedCallback() {
-    await pereinjatyStyl(this);
+    await adoptStyle(this);
     this.shadowRoot.querySelectorAll('a').forEach((a) => {
       a.addEventListener('click', (e) => {
         e.preventDefault();

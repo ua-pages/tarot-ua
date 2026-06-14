@@ -1,6 +1,6 @@
-import { formatuvatyData, hrupaElementyPoMisats, mnozhynatyKarta } from '../utils.js';
+import { formatDate, groupEntriesByMonth, pluralizeCard } from '../utils.js';
 import { TONE_LABELS } from '../constants/interpretation.js';
-import { zavantazhytyZhurnal, onovytyZapys } from '../services/journal-storage.js';
+import { loadJournal, updateEntry } from '../services/journal-storage.js';
 
 const template = document.createElement('template');
 template.innerHTML = `
@@ -28,7 +28,7 @@ template.innerHTML = `
   </main>
 `;
 
-import { pereinjatyStyl } from '../shared-styles.js';
+import { adoptStyle } from '../shared-styles.js';
 
 export class JournalPage extends HTMLElement {
   constructor() {
@@ -40,14 +40,14 @@ export class JournalPage extends HTMLElement {
   }
 
   async connectedCallback() {
-    await pereinjatyStyl(this);
+    await adoptStyle(this);
     this.shadowRoot.querySelectorAll('a').forEach((a) => {
       a.addEventListener('click', (e) => {
         e.preventDefault();
         window.navigateTo(a.getAttribute('href'));
       });
     });
-    this._items = await zavantazhytyZhurnal();
+    this._items = await loadJournal();
     this.render();
   }
 
@@ -64,7 +64,7 @@ export class JournalPage extends HTMLElement {
 
     empty.style.display = 'none';
 
-    const groups = hrupaElementyPoMisats(items);
+    const groups = groupEntriesByMonth(items);
     content.innerHTML = groups.map((group) => `
       <section class="journal-month">
         <h3>${group.month}</h3>
@@ -90,7 +90,7 @@ export class JournalPage extends HTMLElement {
       btn.addEventListener('click', async () => {
         const id = btn.dataset.id;
         const note = this._draftNotes[id] || '';
-        await onovytyZapys(id, { note });
+        await updateEntry(id, { note });
         this._draftNotes[id] = note;
         btn.textContent = 'Нотатку збережено';
         setTimeout(() => { btn.textContent = 'Зберегти нотатку'; }, 2000);
@@ -107,7 +107,7 @@ export class JournalPage extends HTMLElement {
     const cardsHtml = entry.cards.map((drawn) => `
       <article class="journal-drawn-card">
         <img src="${drawn.card.image}" alt="${drawn.card.name}" class="${drawn.reversed ? 'is-reversed' : ''}" loading="lazy" decoding="async"
-          onerror="this.src='/cards/tarot-placeholder.svg'">
+          onerror="this.src='cards/tarot-placeholder.svg'">
         <div>
           <span class="journal-position">${drawn.position}</span>
           <strong>${drawn.card.name}</strong>
@@ -139,7 +139,7 @@ export class JournalPage extends HTMLElement {
           <span class="journal-icon">${entry.favorite ? '★' : '✦'}</span>
           <span class="journal-main">
             <strong>${entry.title}</strong>
-            <small>${formatuvatyData(entry.createdAt)} · ${entry.cards.length} ${mnozhynatyKarta(entry.cards.length)} · ${toneLabel}</small>
+            <small>${formatDate(entry.createdAt)} · ${entry.cards.length} ${pluralizeCard(entry.cards.length)} · ${toneLabel}</small>
           </span>
           <span class="journal-chevron">${isExpanded ? '−' : '+'}</span>
         </button>

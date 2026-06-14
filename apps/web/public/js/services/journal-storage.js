@@ -1,10 +1,10 @@
 import {
-  otrymatyVsiZapysy,
-  dodatyZapysDoZhumalu,
-  onovytyZapysUZhumali,
-  vydalytyZapysIZhumalu,
-  otrymatyObraniZapysy,
-  mihruvatyZLocalStorage,
+  getAllEntries,
+  addEntryToJournal,
+  updateEntryInJournal,
+  deleteEntryFromJournal,
+  getFavoriteEntries,
+  migrateFromLocalStorage,
 } from './indexed-db.js';
 
 let initialized = false;
@@ -12,17 +12,17 @@ let initialized = false;
 async function ensureInit() {
   if (initialized) return;
   initialized = true;
-  await mihruvatyZLocalStorage();
+  await migrateFromLocalStorage();
 }
 
-export async function zavantazhytyZhurnal() {
+export async function loadJournal() {
   await ensureInit();
-  return otrymatyVsiZapysy();
+  return getAllEntries();
 }
 
-export async function dodatyZapys(entry) {
+export async function addEntry(entry) {
   await ensureInit();
-  return dodatyZapysDoZhumalu({
+  return addEntryToJournal({
     title: entry.title,
     spreadType: entry.spreadType,
     cards: entry.cards,
@@ -32,17 +32,17 @@ export async function dodatyZapys(entry) {
   });
 }
 
-export async function onovytyZapys(id, updates) {
+export async function updateEntry(id, updates) {
   await ensureInit();
-  return onovytyZapysUZhumali(id, updates);
+  return updateEntryInJournal(id, updates);
 }
 
-export async function vydalytyZapys(id) {
+export async function deleteEntry(id) {
   await ensureInit();
-  return vydalytyZapysIZhumalu(id);
+  return deleteEntryFromJournal(id);
 }
 
-export async function zavantazhytyObrane() {
+export async function loadFavorites() {
   await ensureInit();
-  return otrymatyObraniZapysy();
+  return getFavoriteEntries();
 }

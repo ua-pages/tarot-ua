@@ -1,6 +1,6 @@
-import { initsializuvatyAnalityka, stezhytyPodiia } from '../analytics/analytics.js';
-import { onovytyFunktsiiaPrapory } from '../analytics/use-features.js';
-import { pereinjatyStyl } from '../shared-styles.js';
+import { initAnalytics, trackEvent } from '../analytics/analytics.js';
+import { updateFeatureFlags } from '../analytics/use-features.js';
+import { adoptStyle } from '../shared-styles.js';
 
 import './app-nav.js';
 import './auth-panel.js';
@@ -21,7 +21,7 @@ import './tarot-board.js';
 import './tarot-journal.js';
 
 const template = document.createElement('template');
-template.innerHTML = `<div id="outlet"></div>`;
+template.innerHTML = `<div id="outlet"></div><footer class="made-in-ua">✦ Вироблено в Україні ✦</footer>`;
 
 export class AppRoot extends HTMLElement {
   constructor() {
@@ -33,7 +33,7 @@ export class AppRoot extends HTMLElement {
   }
 
   async connectedCallback() {
-    await pereinjatyStyl(this);
+    await adoptStyle(this);
     window.navigateTo = (path) => {
       window.history.pushState({}, '', path);
       this.route();
@@ -41,8 +41,8 @@ export class AppRoot extends HTMLElement {
 
     window.addEventListener('popstate', () => this.route());
 
-    void initsializuvatyAnalityka();
-    void onovytyFunktsiiaPrapory();
+    void initAnalytics();
+    void updateFeatureFlags();
     this.addCursorGlow();
 
     this.route();

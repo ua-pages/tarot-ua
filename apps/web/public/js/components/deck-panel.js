@@ -12,7 +12,7 @@ template.innerHTML = `
   </section>
 `;
 
-import { pereinjatyStyl } from '../shared-styles.js';
+import { adoptStyle } from '../shared-styles.js';
 
 export class DeckPanel extends HTMLElement {
   constructor() {
@@ -25,7 +25,7 @@ export class DeckPanel extends HTMLElement {
   }
 
   async connectedCallback() {
-    await pereinjatyStyl(this);
+    await adoptStyle(this);
     this.shadowRoot.getElementById('toggle-btn').addEventListener('click', () => {
       this.dispatchEvent(new CustomEvent('toggle'));
     });

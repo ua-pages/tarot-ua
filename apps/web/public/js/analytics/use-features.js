@@ -1,4 +1,4 @@
-import { jeFunktsiiaUvimknutyy, perezavantazhytyFunktsiiaPrapory } from './analytics.js';
+import { isFeatureEnabled, reloadFeatureFlags } from './analytics.js';
 
 const fallbackFlags = {
   mysticHeroV2: false,
@@ -18,42 +18,42 @@ const flags = { ...fallbackFlags };
 let loaded = false;
 const listeners = [];
 
-export async function onovytyFunktsiiaPrapory() {
-  await perezavantazhytyFunktsiiaPrapory();
+export async function updateFeatureFlags() {
+  await reloadFeatureFlags();
   for (const [localKey, remoteKey] of Object.entries(postHogFlagKeys)) {
-    flags[localKey] = jeFunktsiiaUvimknutyy(remoteKey, fallbackFlags[localKey]);
+    flags[localKey] = isFeatureEnabled(remoteKey, fallbackFlags[localKey]);
   }
   loaded = true;
   listeners.forEach((fn) => fn(flags));
 }
 
-export function naPraporyZmina(fn) {
+export function onFlagsChange(fn) {
   listeners.push(fn);
   if (loaded) fn(flags);
 }
 
-export function otymatyPrapory() {
+export function getFlags() {
   return flags;
 }
 
-export function jeUvimknutyy(key) {
+export function isEnabled(key) {
   return flags[key];
 }
 
-export function otymatyEksperymentVariant(name, variants, fallback = variants[0]) {
+export function getExperimentVariant(name, variants, fallback = variants[0]) {
   if (!variants.length || typeof window === 'undefined') return fallback;
   const cached = window.localStorage.getItem(`tarot-exp-${name}`);
   if (cached && variants.includes(cached)) return cached;
-  const index = Math.abs(heshuvatyRiadok(`${name}:${navigator.userAgent}`)) % variants.length;
+  const index = Math.abs(hashString(`${name}:${navigator.userAgent}`)) % variants.length;
   const selected = variants[index] ?? fallback;
   window.localStorage.setItem(`tarot-exp-${name}`, selected);
   return selected;
 }
 
-function heshuvatyRiadok(value) {
-  let heshuvaty = 0;
+function hashString(value) {
+  let hash = 0;
   for (let index = 0; index < value.length; index += 1) {
-    heshuvaty = ((heshuvaty << 5) - heshuvaty + value.charCodeAt(index)) | 0;
+    hash = ((hash << 5) - hash + value.charCodeAt(index)) | 0;
   }
-  return heshuvaty;
+  return hash;
 }

@@ -19,7 +19,7 @@ template.innerHTML = `
   </section>
 `;
 
-import { pereinjatyStyl } from '../shared-styles.js';
+import { adoptStyle } from '../shared-styles.js';
 
 export class AuthPanel extends HTMLElement {
   constructor() {
@@ -31,7 +31,7 @@ export class AuthPanel extends HTMLElement {
   }
 
   async connectedCallback() {
-    await pereinjatyStyl(this);
+    await adoptStyle(this);
     this.updateUI();
 
     this.shadowRoot.getElementById('save-btn').addEventListener('click', () => {

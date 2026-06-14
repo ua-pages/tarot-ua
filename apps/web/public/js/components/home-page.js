@@ -48,8 +48,8 @@ template.innerHTML = `
   </main>
 `;
 
-import { pereinjatyStyl } from '../shared-styles.js';
-import { zberehtyNikneym } from '../services/session-storage.js';
+import { adoptStyle } from '../shared-styles.js';
+import { saveNickname } from '../services/session-storage.js';
 
 export class HomePage extends HTMLElement {
   constructor() {
@@ -59,7 +59,7 @@ export class HomePage extends HTMLElement {
   }
 
   async connectedCallback() {
-    await pereinjatyStyl(this);
+    await adoptStyle(this);
     this.shadowRoot.querySelectorAll('a').forEach((a) => {
       a.addEventListener('click', (e) => {
         e.preventDefault();
@@ -72,7 +72,7 @@ export class HomePage extends HTMLElement {
       const input = this.shadowRoot.getElementById('nickname-input');
       const name = input.value.trim();
       if (!name) return;
-      zberehtyNikneym(name);
+      saveNickname(name);
       window.navigateTo('/fast-session');
     });
   }

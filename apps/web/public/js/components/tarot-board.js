@@ -1,14 +1,14 @@
-import { zatrymty, otymatySohodniMitka, kartaZnachennia } from '../utils.js';
-import { pobuduvatyPodilytysiaPerehliad } from '../share-preview.js';
-import { stezhytyPodiia, rozkładAnalitykaVantazh, interpretatsiiaAnalitykaVantazh } from '../analytics/analytics.js';
-import { otymatyPrapory, naPraporyZmina } from '../analytics/use-features.js';
+import { sleep, getTodayTag, getCardMeaning } from '../utils.js';
+import { buildSharePreview } from '../share-preview.js';
+import { trackEvent, spreadAnalyticsPayload, interpretationAnalyticsPayload } from '../analytics/analytics.js';
+import { getFlags, onFlagsChange } from '../analytics/use-features.js';
 import { INTERPRETATION_TONES } from '../constants/interpretation.js';
 import {
-  stvorytyDostupnyiRozkład, namaliuvatyRozkład, zavantazhytyKartaDen,
-  zavantazhytyKarta, zavantazhytySpilnyiRozkład,
-  zavantazhytyRozkładVyznachennia, zavantazhytyRozkładInterpretatsiia,
+  createShareableSpread, drawSpreadCards, fetchCardOfDay,
+  fetchCards, fetchSharedSpread,
+  fetchSpreadDefinitions, fetchSpreadInterpretation,
 } from '../services/api.js';
-import { zavantazhytyZhurnal, dodatyZapys, onovytyZapys, zavantazhytyObrane } from '../services/journal-storage.js';
+import { loadJournal, addEntry, updateEntry, loadFavorites } from '../services/journal-storage.js';
 
 const template = document.createElement('template');
 template.innerHTML = `
@@ -49,7 +49,7 @@ template.innerHTML = `
   </main>
 `;
 
-import { pereinjatyStyl } from '../shared-styles.js';
+import { adoptStyle } from '../shared-styles.js';
 
 export class TarotBoard extends HTMLElement {
   constructor() {
@@ -81,20 +81,20 @@ export class TarotBoard extends HTMLElement {
     this.shareLoading = false;
     this.isSharedView = false;
 
-    this._flags = otymatyPrapory();
-    this.todayLabel = otymatySohodniMitka();
+    this._flags = getFlags();
+    this.todayLabel = getTodayTag();
     this.interpretationTones = INTERPRETATION_TONES;
   }
 
   async connectedCallback() {
-    await pereinjatyStyl(this);
+    await adoptStyle(this);
     this.bindEvents();
-    naPraporyZmina((flags) => {
+    onFlagsChange((flags) => {
       this._flags = flags;
       this.updatePremiumPreview();
     });
 
-    stezhytyPodiia('app_opened', {});
+    trackEvent('app_opened', {});
 
     try {
       this.loadLocalUser();
@@ -130,12 +130,12 @@ export class TarotBoard extends HTMLElement {
     });
 
     root.getElementById('scroll-ritual-btn').addEventListener('click', () => {
-      stezhytyPodiia('ritual_start_clicked');
+      trackEvent('ritual_start_clicked');
       root.getElementById('ritual-selector').scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 
     root.getElementById('premium-preview-btn').addEventListener('click', () => {
-      stezhytyPodiia('premium_preview_clicked', {
+      trackEvent('premium_preview_clicked', {
         spreadType: this.activeSpreadType,
         hasSpread: Boolean(this.spread.length)
       });
@@ -199,7 +199,7 @@ export class TarotBoard extends HTMLElement {
 
   // Session methods
   async chooseSpread(type) {
-    stezhytyPodiia('spread_selected', { spreadType: type });
+    trackEvent('spread_selected', { spreadType: type });
     this.selectorCollapsed = true;
     this.updateRitualSelector();
     await this.refreshSpread(type);
@@ -212,7 +212,7 @@ export class TarotBoard extends HTMLElement {
     if (this.cards.length || this.deckLoading) return;
     this.deckLoading = true;
     try {
-      this.cards = await zavantazhytyKarta(78);
+      this.cards = await fetchCards(78);
     } finally {
       this.deckLoading = false;
       this.updateDeckPanel();
@@ -221,7 +221,7 @@ export class TarotBoard extends HTMLElement {
 
   async toggleDeck() {
     this.showDeck = !this.showDeck;
-    stezhytyPodiia('deck_toggled', { expanded: this.showDeck });
+    trackEvent('deck_toggled', { expanded: this.showDeck });
     this.updateDeckPanel();
     if (this.showDeck) await this.loadCards();
   }
@@ -234,19 +234,19 @@ export class TarotBoard extends HTMLElement {
   }
 
   async loadSpreadDefinitions() {
-    this.spreadDefinitions = await zavantazhytyRozkładVyznachennia();
+    this.spreadDefinitions = await fetchSpreadDefinitions();
     this.updateRitualSelector();
   }
 
   setPlaceholderImage(event) {
     const image = event.target;
-    if (image.src.endsWith('/cards/tarot-placeholder.svg')) return;
-    image.src = '/cards/tarot-placeholder.svg';
+    if (image.src.endsWith('cards/tarot-placeholder.svg')) return;
+    image.src = 'cards/tarot-placeholder.svg';
   }
 
   async loadCardOfDay() {
-    this.cardOfDay = await zavantazhytyKartaDen();
-    stezhytyPodiia('daily_card_opened', {
+    this.cardOfDay = await fetchCardOfDay();
+    trackEvent('daily_card_opened', {
       cardId: this.cardOfDay.card.id,
       reversed: this.cardOfDay.reversed
     });
@@ -282,12 +282,12 @@ export class TarotBoard extends HTMLElement {
 
     try {
       const [drawnCards] = await Promise.all([
-        namaliuvatyRozkład(definition?.count ?? 3, type),
-        zatrymty(520)
+        drawSpreadCards(definition?.count ?? 3, type),
+        sleep(520)
       ]);
       this.spread = drawnCards;
       this.revealKey += this._flags.enhancedReveal ? 1 : 0;
-      stezhytyPodiia('reading_generated', rozkładAnalitykaVantazh(this.spread, this.activeSpreadType));
+      trackEvent('reading_generated', spreadAnalyticsPayload(this.spread, this.activeSpreadType));
       await this.generateInterpretation();
       await this.saveSpreadToHistory(this.spread, definition?.title ?? `Розклад на ${this.spread.length} карт`);
     } catch (err) {
@@ -319,15 +319,15 @@ export class TarotBoard extends HTMLElement {
     panel.tones = this.interpretationTones;
   }
 
-  async zgenoruvatyInterpretatsiia() {
+  async generateInterpretation() {
     if (!this.spread.length) return;
 
     this.interpretationLoading = true;
     this.updateInterpretationPanel();
 
     try {
-      this.interpretation = await zavantazhytyRozkładInterpretatsiia(this.spread, this.activeSpreadType, this.interpretationTone);
-      stezhytyPodiia('ai_interpretation_generated', interpretatsiiaAnalitykaVantazh({
+      this.interpretation = await fetchSpreadInterpretation(this.spread, this.activeSpreadType, this.interpretationTone);
+      trackEvent('ai_interpretation_generated', interpretationAnalyticsPayload({
         spread: this.spread,
         spreadType: this.activeSpreadType,
         tone: this.interpretationTone,
@@ -344,13 +344,13 @@ export class TarotBoard extends HTMLElement {
   async setInterpretationTone(tone) {
     if (this.interpretationTone === tone) return;
     this.interpretationTone = tone;
-    stezhytyPodiia('interpretation_tone_changed', { tone });
+    trackEvent('interpretation_tone_changed', { tone });
     await this.generateInterpretation();
   }
 
   async syncLocalLists() {
-    this.spreadHistory = await zavantazhytyZhurnal();
-    this.favoriteSpreads = await zavantazhytyObrane();
+    this.spreadHistory = await loadJournal();
+    this.favoriteSpreads = await loadFavorites();
     this.updateJournals();
   }
 
@@ -362,7 +362,7 @@ export class TarotBoard extends HTMLElement {
   async saveSpreadToHistory(cards, title) {
     if (!cards.length) return;
 
-    const saved = await dodatyZapys({
+    const saved = await addEntry({
       title,
       spreadType: this.activeSpreadType,
       cards,
@@ -380,7 +380,7 @@ export class TarotBoard extends HTMLElement {
 
     try {
       const def = this.spreadDefinitions.find((d) => d.id === this.activeSpreadType);
-      const saved = await dodatyZapys({
+      const saved = await addEntry({
         title: def?.title ?? 'Обраний розклад',
         spreadType: this.activeSpreadType,
         cards: this.spread,
@@ -390,7 +390,7 @@ export class TarotBoard extends HTMLElement {
 
       this.favoriteSpreads.unshift(saved);
       this.favoriteSpreads = this.favoriteSpreads.slice(0, 12);
-      stezhytyPodiia('favorite_added', rozkładAnalitykaVantazh(this.spread, this.activeSpreadType));
+      trackEvent('favorite_added', spreadAnalyticsPayload(this.spread, this.activeSpreadType));
       this.copyStatus = 'Розклад додано в обране.';
     } catch (err) {
       this.copyStatus = err instanceof Error ? err.message : 'Не вдалося додати в обране.';
@@ -407,7 +407,7 @@ export class TarotBoard extends HTMLElement {
     this.shareResult = null;
     this.sharePreviewUrl = '';
     this.copyStatus = 'Розклад відкрито з Книги розкладів.';
-    stezhytyPodiia('journal_entry_opened', {
+    trackEvent('journal_entry_opened', {
       id: entry.id,
       spreadType: entry.spreadType,
       favorite: entry.favorite,
@@ -421,11 +421,11 @@ export class TarotBoard extends HTMLElement {
 
   async saveJournalNote(payload) {
     try {
-      const updated = await onovytyZapys(payload.id, { note: payload.note });
+      const updated = await updateEntry(payload.id, { note: payload.note });
       if (updated) {
-        this.spreadHistory = await zavantazhytyZhurnal();
-        this.favoriteSpreads = await zavantazhytyObrane();
-        stezhytyPodiia('journal_note_saved', { id: payload.id, noteLength: payload.note.length });
+        this.spreadHistory = await loadJournal();
+        this.favoriteSpreads = await loadFavorites();
+        trackEvent('journal_note_saved', { id: payload.id, noteLength: payload.note.length });
         this.copyStatus = 'Нотатку збережено.';
       }
     } catch (err) {
@@ -437,7 +437,7 @@ export class TarotBoard extends HTMLElement {
   async shareCurrentSpread() {
     if (!this.spread.length) return;
 
-    stezhytyPodiia('share_clicked', rozkładAnalitykaVantazh(this.spread, this.activeSpreadType));
+    trackEvent('share_clicked', spreadAnalyticsPayload(this.spread, this.activeSpreadType));
 
     this.shareLoading = true;
     this.copyStatus = '';
@@ -445,7 +445,7 @@ export class TarotBoard extends HTMLElement {
     try {
       const def = this.spreadDefinitions.find((d) => d.id === this.activeSpreadType);
       const title = def?.title ?? 'Мій розклад Таро';
-      const result = await stvorytyDostupnyiRozkład({
+      const result = await createShareableSpread({
         title,
         spreadType: this.activeSpreadType,
         cards: this.spread,
@@ -453,8 +453,8 @@ export class TarotBoard extends HTMLElement {
       });
 
       this.shareResult = result;
-      this.sharePreviewUrl = await pobuduvatyPodilytysiaPerehliad(result);
-      stezhytyPodiia('share_link_created', {
+      this.sharePreviewUrl = await buildSharePreview(result);
+      trackEvent('share_link_created', {
         slug: result.slug,
         ...spreadAnalyticsPayload(this.spread, this.activeSpreadType)
       });
@@ -478,7 +478,7 @@ export class TarotBoard extends HTMLElement {
     if (!this.shareResult) return;
     try {
       await navigator.clipboard.writeText(this.shareResult.url);
-      stezhytyPodiia('share_url_copied', { slug: this.shareResult.slug });
+      trackEvent('share_url_copied', { slug: this.shareResult.slug });
       this.copyStatus = 'Посилання скопійовано.';
     } catch {
       this.copyStatus = 'Не вдалося скопіювати посилання автоматично.';
@@ -497,7 +497,7 @@ export class TarotBoard extends HTMLElement {
 
     if (navigator.share) {
       await navigator.share(payload);
-      stezhytyPodiia('native_share_completed', { slug: this.shareResult.slug });
+      trackEvent('native_share_completed', { slug: this.shareResult.slug });
       return;
     }
 
@@ -505,16 +505,16 @@ export class TarotBoard extends HTMLElement {
   }
 
   async loadSharedView(slug) {
-    const shared = await zavantazhytySpilnyiRozkład(slug);
+    const shared = await fetchSharedSpread(slug);
     this.isSharedView = true;
     this.activeSpreadType = shared.spreadType;
     this.spread = shared.cards;
     this.interpretation = shared.interpretation;
     this.selectorCollapsed = true;
     this.shareResult = shared;
-    this.sharePreviewUrl = await pobuduvatyPodilytysiaPerehliad(shared);
+    this.sharePreviewUrl = await buildSharePreview(shared);
     this.copyStatus = 'Відкрито публічний розклад.';
-    stezhytyPodiia('shared_spread_opened', {
+    trackEvent('shared_spread_opened', {
       slug,
       spreadType: shared.spreadType,
       cardsCount: shared.cards.length
@@ -535,13 +535,13 @@ export class TarotBoard extends HTMLElement {
         `\n${item.position}: ${item.card.name}${item.reversed ? ' (перевернута)' : ''}`,
         item.positionDescription,
         `Ключові слова: ${item.card.keywords.join(', ')}`,
-        `Значення: ${kartaZnachennia(item)}`
+        `Значення: ${getCardMeaning(item)}`
       ].join('\n'))
     ].join('\n');
 
     try {
       await navigator.clipboard.writeText(text);
-      stezhytyPodiia('reading_text_copied', rozkładAnalitykaVantazh(this.spread, this.activeSpreadType));
+      trackEvent('reading_text_copied', spreadAnalyticsPayload(this.spread, this.activeSpreadType));
       this.copyStatus = 'Текст розкладу скопійовано.';
     } catch {
       this.copyStatus = 'Не вдалося скопіювати автоматично.';

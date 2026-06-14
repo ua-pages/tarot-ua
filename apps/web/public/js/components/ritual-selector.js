@@ -1,4 +1,4 @@
-import { rozkładMeta } from '../constants/spreads.js';
+import { getSpreadMeta } from '../constants/spreads.js';
 
 const template = document.createElement('template');
 template.innerHTML = `
@@ -16,7 +16,7 @@ template.innerHTML = `
   </section>
 `;
 
-import { pereinjatyStyl } from '../shared-styles.js';
+import { adoptStyle } from '../shared-styles.js';
 
 export class RitualSelector extends HTMLElement {
   constructor() {
@@ -31,7 +31,7 @@ export class RitualSelector extends HTMLElement {
   }
 
   async connectedCallback() {
-    await pereinjatyStyl(this);
+    await adoptStyle(this);
     this.shadowRoot.getElementById('expand-btn').addEventListener('click', () => {
       this._collapsed = false;
       this.updateUI();
@@ -76,7 +76,7 @@ export class RitualSelector extends HTMLElement {
       grid.style.display = 'none';
       const activeDef = this._definitions.find((d) => d.id === this._activeType);
       if (activeDef) {
-        const meta = rozkładMeta(activeDef.id);
+        const meta = getSpreadMeta(activeDef.id);
         summary.style.display = 'flex';
         summary.innerHTML = `
           <span>${meta.icon}</span>
@@ -96,7 +96,7 @@ export class RitualSelector extends HTMLElement {
   renderGrid(container) {
     container.innerHTML = '';
     this._definitions.forEach((def) => {
-      const meta = rozkładMeta(def.id);
+      const meta = getSpreadMeta(def.id);
       const btn = document.createElement('button');
       btn.className = `spread-button spread-choice practice-card${def.id === this._activeType ? ' active' : ''}`;
       btn.disabled = this._loading;

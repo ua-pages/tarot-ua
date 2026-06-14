@@ -1,4 +1,4 @@
-import { kartaZnachennia } from '../utils.js';
+import { getCardMeaning } from '../utils.js';
 
 const template = document.createElement('template');
 template.innerHTML = `
@@ -19,7 +19,7 @@ template.innerHTML = `
   </section>
 `;
 
-import { pereinjatyStyl } from '../shared-styles.js';
+import { adoptStyle } from '../shared-styles.js';
 
 export class CardOfDayPanel extends HTMLElement {
   constructor() {
@@ -31,7 +31,7 @@ export class CardOfDayPanel extends HTMLElement {
   }
 
   async connectedCallback() {
-    await pereinjatyStyl(this);
+    await adoptStyle(this);
     const img = this.shadowRoot.getElementById('card-image');
     img.addEventListener('error', (e) => {
       this.dispatchEvent(new CustomEvent('image-error', { detail: e }));
@@ -75,7 +75,7 @@ export class CardOfDayPanel extends HTMLElement {
     this.shadowRoot.getElementById('card-name').innerHTML = `${this._card.card.name}${this._card.reversed ? ' <span>(перевернута)</span>' : ''}`;
     this.shadowRoot.getElementById('position-hint').textContent = this._card.positionDescription;
     this.shadowRoot.getElementById('keywords').textContent = this._card.card.keywords.join(' · ');
-    this.shadowRoot.getElementById('meaning').textContent = kartaZnachennia(this._card);
+    this.shadowRoot.getElementById('meaning').textContent = getCardMeaning(this._card);
   }
 }
 

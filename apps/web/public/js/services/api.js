@@ -1,27 +1,27 @@
 import { getCards, getSpreadDefinitions, drawSpread, getCardOfDay, generateInterpretation } from './tarot-engine.js';
-import { zberehtySpilnyiRozkład, otrymatySpilnyiRozkład } from './indexed-db.js';
+import { saveSharedSpread, getSharedSpread } from './indexed-db.js';
 
-export function zavantazhytyKarta(kilkist = 78) {
-  return Promise.resolve(getCards(kilkist));
+export function fetchCards(count = 78) {
+  return Promise.resolve(getCards(count));
 }
 
-export function zavantazhytyRozkładVyznachennia() {
+export function fetchSpreadDefinitions() {
   return Promise.resolve(getSpreadDefinitions());
 }
 
-export function namaliuvatyRozkład(kilkist = 3, type) {
-  return Promise.resolve(drawSpread(kilkist, type));
+export function drawSpreadCards(count = 3, type) {
+  return Promise.resolve(drawSpread(count, type));
 }
 
-export function zavantazhytyKartaDen(date) {
+export function fetchCardOfDay(date) {
   return Promise.resolve(getCardOfDay(date ? new Date(date) : new Date()));
 }
 
-export function zavantazhytyRozkładInterpretatsiia(spread, type, tone = 'psychological') {
+export function fetchSpreadInterpretation(spread, type, tone = 'psychological') {
   return Promise.resolve(generateInterpretation(spread, type, tone));
 }
 
-function stvorytySluh() {
+function makeSlug() {
   const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
   let slug = '';
   for (let i = 0; i < 10; i++) {
@@ -30,8 +30,8 @@ function stvorytySluh() {
   return slug;
 }
 
-export async function stvorytyDostupnyiRozkład(input) {
-  const slug = stvorytySluh();
+export async function createShareableSpread(input) {
+  const slug = makeSlug();
   const shared = {
     slug,
     title: input.title,
@@ -47,12 +47,12 @@ export async function stvorytyDostupnyiRozkład(input) {
       imageUrl: '',
     },
   };
-  await zberehtySpilnyiRozkład(shared);
+  await saveSharedSpread(shared);
   return shared;
 }
 
-export async function zavantazhytySpilnyiRozkład(slug) {
-  const shared = await otrymatySpilnyiRozkład(slug);
+export async function fetchSharedSpread(slug) {
+  const shared = await getSharedSpread(slug);
   if (!shared) throw new Error('Розклад не знайдено');
   return shared;
 }
