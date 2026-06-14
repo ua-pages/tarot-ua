@@ -87,16 +87,16 @@ const server = http.createServer((req, res) => {
   const ext = path.extname(url.pathname);
 
   if (ext && fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-    return servuvatyFajl(res, filePath);
+    return serveFile(res, filePath);
   }
-  if (jeSpaMarshrut(url.pathname) || url.pathname === '/') {
-    return servuvatyIndeks(req, res);
+  if (isSpaRoute(url.pathname) || url.pathname === '/') {
+    return serveIndex(req, res);
   }
   const altPath = path.join(publicDir, url.pathname.slice(1), 'index.html');
   if (fs.existsSync(altPath)) {
-    return servuvatyFajl(res, altPath);
+    return serveFile(res, altPath);
   }
-  return servuvatyIndeks(req, res);
+  return serveIndex(req, res);
 });
 
 server.listen(port, () => {
