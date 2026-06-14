@@ -38,8 +38,8 @@ function parseEnv(filePath) {
 const env = parseEnv(envPath);
 
 function injectEnv(html) {
-  const envScript = `<script>window.ENV = ${JSON.stringify(env)};</script>`;
-  return html.replace('<script>\n      window.ENV = window.ENV || {};', envScript + '\n      ');
+  const envLine = `window.ENV = ${JSON.stringify(env)};`;
+  return html.replace('window.ENV = window.ENV || {};', envLine);
 }
 
 function serveFile(res, filePath) {

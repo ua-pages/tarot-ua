@@ -151,6 +151,9 @@ export class TarotBoard extends HTMLElement {
     ritualSelector.addEventListener('choose', (e) => this.chooseSpread(e.detail));
     ritualSelector.addEventListener('expand', () => { this.selectorCollapsed = false; });
 
+    const cardOfDayPanel = root.getElementById('card-of-day');
+    cardOfDayPanel.addEventListener('image-error', (e) => this.setPlaceholderImage(e.detail));
+
     const spreadBoard = root.getElementById('spread-board');
     spreadBoard.addEventListener('favorite', () => this.saveFavoriteSpread());
     spreadBoard.addEventListener('copy', () => this.copySpreadText());

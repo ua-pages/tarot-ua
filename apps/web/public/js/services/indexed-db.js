@@ -102,10 +102,9 @@ export function deleteEntryFromJournal(id) {
 
 export function getFavoriteEntries() {
   return executeTransaction('journal', 'readonly', (store, resolve, reject) => {
-    const index = store.index('favorite');
-    const req = index.getAll(true);
+    const req = store.getAll();
     req.onsuccess = () => {
-      const entries = req.result || [];
+      const entries = (req.result || []).filter((e) => e.favorite);
       entries.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       resolve(entries);
     };

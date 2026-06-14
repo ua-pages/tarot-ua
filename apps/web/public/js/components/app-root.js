@@ -35,7 +35,10 @@ export class AppRoot extends HTMLElement {
   async connectedCallback() {
     await adoptStyle(this);
     window.navigateTo = (path) => {
-      window.history.pushState({}, '', path);
+      const base = '/tarot-ua';
+      const clean = path.startsWith(base) ? path.slice(base.length) : path;
+      const full = base + (clean.startsWith('/') ? clean : '/' + clean);
+      window.history.pushState({}, '', full);
       this.route();
     };
 

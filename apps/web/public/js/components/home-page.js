@@ -20,8 +20,11 @@ template.innerHTML = `
         </div>
       </form>
 
+      <card-of-day-panel id="card-of-day" style="display:none; margin-top:2rem"></card-of-day-panel>
+
       <div class="quiet-actions">
-        <a class="quiet-btn quiet-btn-ghost" href="/session">Повільна сесія</a>
+        <a class="quiet-btn quiet-btn-primary" href="/session">Повільна сесія</a>
+        <a class="quiet-btn quiet-btn-ghost" href="/fast-session">Швидка сесія</a>
         <a class="quiet-btn quiet-btn-ghost" href="/journal">Відкрити щоденник</a>
       </div>
     </section>
@@ -49,7 +52,9 @@ template.innerHTML = `
 `;
 
 import { adoptStyle } from '../shared-styles.js';
-import { saveNickname } from '../services/session-storage.js';
+import { saveNickname, loadNickname } from '../services/session-storage.js';
+import { fetchCardOfDay } from '../services/api.js';
+import { getTodayTag } from '../utils.js';
 
 export class HomePage extends HTMLElement {
   constructor() {
@@ -66,15 +71,35 @@ export class HomePage extends HTMLElement {
         window.navigateTo(a.getAttribute('href'));
       });
     });
+
     const form = this.shadowRoot.getElementById('nickname-form');
+    const existingName = loadNickname();
+    if (existingName) {
+      form.style.display = 'none';
+      this.showCardOfDay();
+    }
+
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const input = this.shadowRoot.getElementById('nickname-input');
       const name = input.value.trim();
       if (!name) return;
       saveNickname(name);
-      window.navigateTo('/fast-session');
+      form.style.display = 'none';
+      this.showCardOfDay();
     });
+  }
+
+  async showCardOfDay() {
+    const panel = this.shadowRoot.getElementById('card-of-day');
+    try {
+      const card = await fetchCardOfDay();
+      panel.card = card;
+      panel.todayLabel = getTodayTag();
+      panel.style.display = '';
+    } catch {
+      panel.style.display = 'none';
+    }
   }
 }
 
