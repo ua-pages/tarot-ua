@@ -20,6 +20,7 @@ template.innerHTML = `
 `;
 
 import { adoptStyle } from '../shared-styles.js';
+import './app-nav.js';
 
 export class LibraryPage extends HTMLElement {
   constructor() {

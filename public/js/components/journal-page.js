@@ -29,6 +29,7 @@ template.innerHTML = `
 `;
 
 import { adoptStyle } from '../shared-styles.js';
+import './app-nav.js';
 
 export class JournalPage extends HTMLElement {
   constructor() {

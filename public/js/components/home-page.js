@@ -16,6 +16,7 @@ template.innerHTML = `
 import { adoptStyle } from '../shared-styles.js';
 import { getCardOfDay } from '../services/tarot-engine.js';
 import { getTodayTag } from '../utils.js';
+import './card-of-day-panel.js';
 
 export class HomePage extends HTMLElement {
   constructor() {

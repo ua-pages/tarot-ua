@@ -50,6 +50,14 @@ template.innerHTML = `
 `;
 
 import { adoptStyle } from '../shared-styles.js';
+import './auth-panel.js';
+import './ritual-selector.js';
+import './card-of-day-panel.js';
+import './spread-board.js';
+import './share-panel.js';
+import './interpretation-panel.js';
+import './tarot-journal.js';
+import './deck-panel.js';
 
 export class TarotBoard extends HTMLElement {
   constructor() {
