@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "test": "node tarot-engine.test.js",
-    "test:watch": "node --watch tarot-engine.test.js"
+    "test:watch": "node --watch tarot-engine.test.js",
+    "icons": "node scripts/generate-icons.js"
   }
 }

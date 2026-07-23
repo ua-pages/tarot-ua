@@ -1,0 +1,30 @@
+{
+  "name": "Tarot UA — карта дня для рефлексії",
+  "short_name": "Tarot UA",
+  "description": "Карта дня українською: коротка рефлексія та особиста нотатка, яка зберігається лише у вашому браузері.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0b0e1a",
+  "theme_color": "#100b1f",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
