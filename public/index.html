@@ -4,23 +4,30 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#100b1f" />
-    <base href="/tarot-ua/" />
-    <link rel="canonical" href="https://m00rlock.github.io/tarot-ua/" />
-    <title>Tarot UA — онлайн розклади Таро українською</title>
-    <meta name="description" content="Розклади Таро українською: значення всіх 78 карт, перевернуті положення, ШІ-тлумачення, щоденник та публічні посилання." />
-    <meta property="og:title" content="Tarot UA — онлайн розклади Таро українською" />
-    <meta property="og:description" content="Значення всіх 78 карт Таро, розклади, перевернуті позиції та ШІ-тлумачення українською." />
+    <link rel="canonical" href="https://ua-pages.github.io/tarot-ua/" />
+    <title>Tarot UA — карта дня для рефлексії</title>
+    <meta name="description" content="Карта дня українською: коротка рефлексія та особиста нотатка, яка зберігається лише у вашому браузері." />
+    <meta property="og:title" content="Tarot UA — карта дня для рефлексії" />
+    <meta property="og:description" content="Одна карта, одне запитання й локальна нотатка. Без реєстрації та передбачень." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://m00rlock.github.io/tarot-ua/seo/og-default.svg" />
-    <meta property="og:url" content="https://m00rlock.github.io/tarot-ua/" />
+    <meta property="og:image" content="https://ua-pages.github.io/tarot-ua/seo/og-default.svg" />
+    <meta property="og:url" content="https://ua-pages.github.io/tarot-ua/" />
     <meta name="twitter:card" content="summary_large_image" />
     <script>
       window.ENV = window.ENV || {};
-      // GitHub Pages SPA redirect restore
       (function () {
+        const marker = '/tarot-ua/';
+        const markerIndex = location.pathname.indexOf(marker);
+        const basePath = markerIndex >= 0
+          ? location.pathname.slice(0, markerIndex + marker.length)
+          : '/';
+        const base = document.createElement('base');
+        base.href = basePath;
+        document.head.appendChild(base);
+
         const q = new URLSearchParams(location.search);
         const p = q.get('p');
-        if (p) history.replaceState(null, '', '/tarot-ua/' + decodeURIComponent(p).replace(/^\//, ''));
+        if (p) history.replaceState(null, '', basePath + decodeURIComponent(p).replace(/^\//, ''));
       })();
     </script>
     <link rel="stylesheet" href="css/styles.css" />

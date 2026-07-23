@@ -8,6 +8,12 @@ import {
   generateInterpretation,
 } from './public/js/services/tarot-engine.js';
 import { runner } from './test-runner.js';
+import {
+  getReflectionQuestion,
+  loadReflection,
+  reflectionKey,
+  saveReflection,
+} from './public/js/services/daily-reflection.js';
 
 // === Карти ===
 runner.describe('tarot-engine: Управління картами', () => {
@@ -265,6 +271,48 @@ runner.describe('tarot-engine: Стрес-тести', () => {
 
     const interp = generateInterpretation(drawn);
     runner.assertHasProperty(interp, 'summary', 'generateInterpretation - має summary');
+  });
+});
+
+runner.describe('daily-reflection: Локальна нотатка', () => {
+  const createStorage = () => {
+    const values = new Map();
+    return {
+      getItem: (key) => values.get(key) ?? null,
+      setItem: (key, value) => values.set(key, value),
+      removeItem: (key) => values.delete(key),
+    };
+  };
+
+  runner.test('ключ залежить лише від локальної дати', () => {
+    runner.assertEquals(
+      reflectionKey(new Date(2026, 6, 23)),
+      'tarot-ua:daily-reflection:2026-07-23',
+      'стабільний ключ дня'
+    );
+  });
+
+  runner.test('нотатка зберігається і читається локально', () => {
+    const storage = createStorage();
+    const date = new Date(2026, 6, 23);
+    runner.assertTrue(saveReflection(storage, '  Моя думка  ', date), 'збереження успішне');
+    runner.assertEquals(loadReflection(storage, date), 'Моя думка', 'повертає очищену нотатку');
+  });
+
+  runner.test('порожня нотатка видаляє запис', () => {
+    const storage = createStorage();
+    const date = new Date(2026, 6, 23);
+    saveReflection(storage, 'Нотатка', date);
+    saveReflection(storage, '   ', date);
+    runner.assertEquals(loadReflection(storage, date), '', 'запис видалено');
+  });
+
+  runner.test('запитання враховує положення карти', () => {
+    const card = { card: { keywords: ['зміни'] }, reversed: true };
+    runner.assertTrue(
+      getReflectionQuestion(card).includes('заважає'),
+      'перевернута карта ставить тіньове запитання'
+    );
   });
 });
 

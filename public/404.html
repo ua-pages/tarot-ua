@@ -3,8 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <script>
-      const base = '/tarot-ua';
-      const path = location.pathname.slice(base.length) || '/';
+      const marker = '/tarot-ua/';
+      const markerIndex = location.pathname.indexOf(marker);
+      const base = markerIndex >= 0
+        ? location.pathname.slice(0, markerIndex + marker.length - 1)
+        : '';
+      const path = markerIndex >= 0
+        ? location.pathname.slice(markerIndex + marker.length - 1)
+        : location.pathname;
       location.replace(base + '/?p=' + encodeURIComponent(path) + location.hash);
     </script>
   </head>

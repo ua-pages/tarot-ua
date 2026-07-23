@@ -82,7 +82,7 @@ body::after {
   animation: aura-spin 28s ease-in-out infinite alternate;
 }
 
-button, input {
+button, input, textarea {
   font: inherit;
 }
 
@@ -518,6 +518,13 @@ img {
   justify-content: center;
   gap: 0.85rem;
   margin-top: 2rem;
+}
+
+.daily-card {
+  display: block;
+  max-width: 760px;
+  margin: clamp(2rem, 6vw, 4rem) auto 0;
+  text-align: left;
 }
 
 .quiet-nickname-form {
@@ -1102,6 +1109,64 @@ img {
     linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.035)),
     rgba(20, 14, 31, 0.68);
   box-shadow: 0 14px 36px rgba(0, 0, 0, 0.22);
+}
+
+.daily-card-copy h3 {
+  margin: 0.25rem 0;
+  color: var(--ink);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.daily-reflection {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(230, 182, 106, 0.18);
+}
+
+.daily-question {
+  margin: 0 0 0.35rem;
+  color: var(--ink);
+  font-family: 'Cormorant Garamond', 'Georgia', serif;
+  font-size: 1.25rem;
+  line-height: 1.45;
+}
+
+.daily-reflection label {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.daily-reflection textarea {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid rgba(124, 136, 184, 0.26);
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
+  background: rgba(8, 6, 17, 0.42);
+  color: var(--ink);
+  line-height: 1.55;
+}
+
+.daily-reflection textarea:focus {
+  outline: 2px solid rgba(218, 186, 136, 0.5);
+  outline-offset: 2px;
+}
+
+.daily-reflection-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+#save-status {
+  color: var(--muted);
+  font-size: 0.78rem;
 }
 
 .card-visual {
@@ -3191,6 +3256,10 @@ img {
 
   .card-day {
     grid-template-columns: 1fr;
+  }
+
+  .card-image {
+    margin-inline: auto;
   }
 
   .hero-ritual {
