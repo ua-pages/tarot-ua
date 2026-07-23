@@ -21,7 +21,7 @@
 
 ## GitHub Pages
 
-Сайт доступний за адресою: [https://m00rlock.github.io/tarot-ua/](https://m00rlock.github.io/tarot-ua/)
+Сайт доступний за адресою: [https://ua-pages.github.io/tarot-ua/](https://ua-pages.github.io/tarot-ua/)
 
 Деплой відбувається автоматично через GitHub Actions при пуші в гілку `main`.
 
