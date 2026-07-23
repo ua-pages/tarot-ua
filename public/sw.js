@@ -11,6 +11,10 @@ const PRECACHE = [
   BASE + '/js/utils.js',
   BASE + '/manifest.json',
   BASE + '/icons/icon.svg',
+  BASE + '/icons/favicon.ico',
+  BASE + '/icons/favicon-32x32.png',
+  BASE + '/icons/favicon-16x16.png',
+  BASE + '/icons/apple-touch-icon.png',
   BASE + '/seo/og-default.svg',
 ]
 
